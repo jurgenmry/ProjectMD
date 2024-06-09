@@ -91,7 +91,7 @@ void APMCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	
 	//DOREPLIFETIME(APMCharacter, CharacterInventory);
 
-	DOREPLIFETIME_CONDITION(APMCharacter, EquippedItem, COND_OwnerOnly);
+	DOREPLIFETIME(APMCharacter, EquippedItem);
 }
 
 int32 APMCharacter::GetPlayerlevel()
@@ -378,6 +378,7 @@ void APMCharacter::EquipItem()
 		if (HasAuthority())
 		{
 			TargetInteractable->EquipItem(this);
+			
 		}
 		else
 		{
@@ -403,6 +404,28 @@ void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwen
 }
 
 
+void APMCharacter::DropItem()
+{
+	if (EquippedItem)
+	{
+		if (HasAuthority())
+		{
+			EquippedItem->DropItem(this);
+			SetEquippedItem(nullptr);
+		}
+		else
+		{
+			Server_DropItem(this);
+		}
+	}
+}
+
+
+void APMCharacter::Server_DropItem_Implementation(APMCharacter* InCharacterOwener)
+{
+	EquippedItem->DropItem(InCharacterOwener);
+	//SetEquippedItem(nullptr);
+}
 
 
 /*

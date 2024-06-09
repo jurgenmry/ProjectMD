@@ -34,6 +34,6 @@ public:
 	virtual void PickUpItem() = 0;
 	virtual void SwapItem() = 0;
 	virtual void EquipItem(class APMCharacter* InPickupOwner) = 0;
-	virtual void DropItem() = 0;
+	virtual void DropItem(APMCharacter* InPickUpOwner) = 0;
 	
 };

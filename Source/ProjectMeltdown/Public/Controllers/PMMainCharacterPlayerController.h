@@ -46,6 +46,10 @@ private:
 	TObjectPtr <UInputAction> InteractAction;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr <UInputAction> DropItemAction;
+
+
 	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr <UInputAction> DropItemAction;
@@ -73,7 +77,7 @@ protected:
 	/*Interact*/
 	void InteractWithObject();
 
-
+	void DropEquippedItem();
 
 	/*
 	void OnDropItemAction(const FInputActionValue& Value);

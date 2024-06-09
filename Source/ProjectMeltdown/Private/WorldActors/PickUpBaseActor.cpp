@@ -45,23 +45,9 @@ APickUpBaseActor::APickUpBaseActor()
 	PickUpMesh->SetupAttachment(GetRootComponent());
 	PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	PickUpMesh->SetIsReplicated(true);
+	PickUpMesh->SetSimulatePhysics(false);
 
-	/*
-	BoxComps = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComps"));
-	//BoxComps->SetupAttachment(GetRootComponent());
-	BoxComps->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	BoxComps->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
-	SetRootComponent(BoxComps);
-	BoxComps->SetHiddenInGame(true);
-
-	SphereComps = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComps"));
-	SphereComps->SetSphereRadius(70.0f);
-	SphereComps->SetupAttachment(GetRootComponent());
-	SphereComps->SetHiddenInGame(true);
-
-	InteractW = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractW"));
-	InteractW->SetupAttachment(BoxComps);
-	*/
+	GetBoxComps()->SetSimulatePhysics(false);
 }
 
 void APickUpBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -108,6 +94,7 @@ void APickUpBaseActor::SetItemProperties(EItemsState State)
 		
 		/*Set Mesh Properties*/
 		PickUpMesh->SetSimulatePhysics(false);
+		PickUpMesh->SetEnableGravity(false);
 		PickUpMesh->SetVisibility(true);
 		PickUpMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -133,6 +120,7 @@ void APickUpBaseActor::SetItemProperties(EItemsState State)
 
 		/*Set Mesh Properties*/
 		PickUpMesh->SetSimulatePhysics(false);
+		//PickUpMesh->SetEnableGravity(false);
 		PickUpMesh->SetVisibility(true);
 		PickUpMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -148,6 +136,27 @@ void APickUpBaseActor::SetItemProperties(EItemsState State)
 		break;
 
 	case EItemsState::EIS_Falling:
+
+		/*Set Mesh Properties*/
+
+		PickUpMesh->SetSimulatePhysics(true);
+		PickUpMesh->SetEnableGravity(true);
+
+		PickUpMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		PickUpMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		PickUpMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+
+		
+		
+		/*Area Sphere properties*/
+		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		/*Box Properties properties*/
+		//GetBoxComps()->SetSimulatePhysics(true);
+		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 		break;
 
 	case EItemsState::EIS_MAX:
@@ -262,6 +271,8 @@ void APickUpBaseActor::StartPickUp(APMCharacter* InPickUpOwner)
 		
 		HandSocket->AttachActor(this, InPickUpOwner->GetMesh1P());
 	}
+	
+	InPickUpOwner->SetEquippedItem(this);
 }
 
 bool APickUpBaseActor::Server_EquipItemActor_Validate(APMCharacter* InPickUpOwner)
@@ -277,12 +288,69 @@ void APickUpBaseActor::Server_EquipItemActor_Implementation(APMCharacter* InPick
 
 
 
-void APickUpBaseActor::DropItem()
+void APickUpBaseActor::DropItem(APMCharacter* InPickUpOwner)
 {
-	//On input button pressed 
-	//Drop the item based on current subIndex
+	if (InPickUpOwner)
+	{
+		if (InPickUpOwner->HasAuthority())
+		{
+			StartDropItem();
+			SetItemState(EItemsState::EIS_Falling);
+		}
+
+		else
+		{
+			Server_DropItem_Implementation();
+		}
+	}
 }
 
+void APickUpBaseActor::StartDropItem()
+{
+	//On input button pressed 
+//Drop the item based on current subIndex
+
+	GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	SetItemState(EItemsState::EIS_Falling);
+	//ItemState = EItemsState::EIS_Falling;
+	/*
+	const FVector Location = GetActorLocation();
+	const FVector Forward = GetOwner()->GetActorForwardVector();
+
+	const float DropItemDistance = 150.0f;
+	const float DropItemTraceDistance = 10000.0f;
+
+	const FVector TraceStart = Location + Forward * DropItemDistance;
+	const FVector TraceEnd = TraceStart - FVector::UpVector * DropItemTraceDistance;
+
+	TArray<AActor*> ActorsToIgnore = { GetOwner() };
+	FHitResult HitResult;
+	FVector TargetLocation = TraceEnd;
+
+	if (UKismetSystemLibrary::LineTraceSingleByProfile(this, TraceStart, TraceEnd, TEXT("WorldStatic"), true, ActorsToIgnore, EDrawDebugTrace::Persistent, HitResult, true))
+	{
+		if (HitResult.bBlockingHit)
+		{
+			TargetLocation = HitResult.Location;
+			SetActorLocation(HitResult.Location);
+		}
+	};
+
+	SetActorLocation(TraceEnd);
+
+
+	GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GetSphereComps()->SetGenerateOverlapEvents(true);
+	GetBoxComps()->SetGenerateOverlapEvents(true);
+	*/
+}
+
+
+void APickUpBaseActor::Server_DropItem_Implementation()
+{
+	StartDropItem();
+}
 
 
 

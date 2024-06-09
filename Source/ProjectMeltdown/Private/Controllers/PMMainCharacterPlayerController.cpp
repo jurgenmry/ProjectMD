@@ -51,6 +51,10 @@ void APMMainCharacterPlayerController::SetupInputComponent()
 		// Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::InteractWithObject);
 
+
+		//DropItem
+		EnhancedInputComponent->BindAction(DropItemAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::DropEquippedItem);
+
 		/*
 		//EquipItem
 		EnhancedInputComponent->BindAction(UnEquipItemAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::OnUnEquipItemAction);
@@ -114,6 +118,14 @@ void APMMainCharacterPlayerController::InteractWithObject()
 	if (!IsValid(ControlledCharacter))
 		return;
 	ControlledCharacter->EquipItem();//Interact();
+}
+
+void APMMainCharacterPlayerController::DropEquippedItem()
+{
+	APMCharacter* ControlledCharacter = Cast<APMCharacter>(GetCharacter());//GetPawn<APMCharacter>();
+	if (!IsValid(ControlledCharacter))
+		return;
+	ControlledCharacter->DropItem();//Interact();
 }
 
 

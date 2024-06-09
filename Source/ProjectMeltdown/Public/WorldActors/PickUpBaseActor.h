@@ -99,10 +99,10 @@ public:
 	UFUNCTION()
 	void OnRep_ItemState(EItemsState State);
 
-	void StartPickUp(APMCharacter* InPickUpOwner);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_EquipItemActor(APMCharacter* InPickUpOwner);
+
+
+
 
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,13 +111,30 @@ public:
 	//                                                                                                   //
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	virtual void PickUpItem() override;
-
-	virtual void SwapItem() override;
-
+	/* Pick Up Item */
 	virtual void EquipItem(class APMCharacter* InPickupOwner) override;
 
-	virtual void DropItem() override;
+	void StartPickUp(APMCharacter* InPickUpOwner);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_EquipItemActor(APMCharacter* InPickUpOwner);
+
+
+	/* Drop  Item */
+	virtual void DropItem(APMCharacter* InPickUpOwner) override;
+
+	void StartDropItem();
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem();
+
+
+
+
+	virtual void SwapItem() override;
+	virtual void PickUpItem() override;
+	
+
 
 	
 

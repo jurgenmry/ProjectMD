@@ -67,7 +67,7 @@ public:
 	virtual void PickUpItem() override {};
 	virtual void SwapItem() override{};
 	virtual void EquipItem(class APMCharacter* InPickupOwner) override {};
-	virtual void DropItem() override {};
+	virtual void DropItem(APMCharacter* InPickUpOwner) override {};
 
 
 protected:

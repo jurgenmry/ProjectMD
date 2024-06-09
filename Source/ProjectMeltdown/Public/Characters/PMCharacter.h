@@ -87,6 +87,9 @@ public:
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "CurentlyEquippedItem")
 	class APickUpBaseActor* EquippedItem; //For the currently Equipped Item
 
+	FORCEINLINE void SetEquippedItem(APickUpBaseActor* NewItem){ EquippedItem = NewItem; }
+	FORCEINLINE APickUpBaseActor* GetEquippedItem() { return EquippedItem; }
+
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void EquipItem(); /* Takes an Item attach it to mesh*/
 
@@ -94,7 +97,10 @@ public:
 	void Server_EquipItem(APMCharacter* InCharacterOwener, UObject* InterfaceContext);
 
 
+	void DropItem();
 
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem(APMCharacter* InCharacterOwener);
 
 
 	/////////////////////////////////////////////////////////////////////
