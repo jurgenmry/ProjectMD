@@ -74,6 +74,9 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaTime) override;
+
+
 
 	//virtual void Interact_Implementation(const class APMCharacter* InInteractOwner) override;
 	virtual void Interact(class APMCharacter* InInteractOwner) override;
@@ -82,6 +85,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Replicated)
 	UStaticMeshComponent* PickUpMesh; 
 
+	FORCEINLINE UStaticMeshComponent* GetItemMesh() const { return PickUpMesh; }
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName ItemTableName;
 
@@ -89,7 +94,7 @@ public:
 
 	//Single Player Needs to be re-worked on multiplayer
 
-	//FORCEINLINE EItemsState GetItemState() const { return ItemState; }
+	FORCEINLINE EItemsState GetItemState() const { return ItemState; }
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ItemState) // Might need to be replicated 
 	EItemsState ItemState = EItemsState::EIS_Pickup;
@@ -97,7 +102,7 @@ public:
 	void SetItemState(EItemsState State);
 
 	UFUNCTION()
-	void OnRep_ItemState(EItemsState State);
+	void OnRep_ItemState(EItemsState OldState);
 
 
 
@@ -129,7 +134,20 @@ public:
 	void Server_DropItem();
 
 
+	/* Drop Item but add Impulse to it */
 
+	FTimerHandle ThrowItemHandle;
+	float ThrowItemTime = 0.7;
+
+	UPROPERTY(Replicated)
+	bool bItemFalling{false};
+
+	void ThrowItem();
+
+	UFUNCTION(Server, Reliable)
+	void Server_ThrowItem(const FVector& ImpulseVector);
+	
+	void StopFalling();
 
 	virtual void SwapItem() override;
 	virtual void PickUpItem() override;

@@ -35,7 +35,7 @@
 
 APickUpBaseActor::APickUpBaseActor()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true; 
 
 	SetReplicateMovement(true);
@@ -47,21 +47,36 @@ APickUpBaseActor::APickUpBaseActor()
 	PickUpMesh->SetIsReplicated(true);
 	PickUpMesh->SetSimulatePhysics(false);
 
-	GetBoxComps()->SetSimulatePhysics(false);
+	GetBoxComps()->SetSimulatePhysics(true);
 }
 
 void APickUpBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(APickUpBaseActor, PickUpMesh);
 	DOREPLIFETIME(APickUpBaseActor, ItemState);
+	DOREPLIFETIME(APickUpBaseActor, bItemFalling);
 
 }
-
 
 void APickUpBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 	SetItemProperties(ItemState);
+}
+
+void APickUpBaseActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	/*
+	if (GetItemState() == EItemsState::EIS_Falling && bItemFalling)
+	{
+		if(HasAuthority())
+		{
+
+		}
+	}
+	*/
 }
 
 
@@ -173,63 +188,9 @@ void APickUpBaseActor::SetItemState(EItemsState State)
 	SetItemProperties(State);
 }
 
-void APickUpBaseActor::OnRep_ItemState(EItemsState State)
+void APickUpBaseActor::OnRep_ItemState(EItemsState OldState)
 {
-	switch (State)
-	{
-	case EItemsState::EIS_Pickup:
-
-		/*Set Mesh Properties*/
-		PickUpMesh->SetSimulatePhysics(false);
-		PickUpMesh->SetVisibility(true);
-		PickUpMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		/*Area Sphere properties*/
-		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
-		/*Box Properties properties*/
-		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetBoxComps()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
-		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-		break;
-
-	case EItemsState::EIS_EquipInterping:
-		break;
-
-	case EItemsState::EIS_PickedUP:
-		break;
-
-	case EItemsState::EIS_Equipped:
-
-		/*Set Mesh Properties*/
-		PickUpMesh->SetSimulatePhysics(false);
-		PickUpMesh->SetVisibility(true);
-		PickUpMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		/*Area Sphere properties*/
-		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		/*Box Properties properties*/
-		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		break;
-
-	case EItemsState::EIS_Falling:
-		break;
-
-	case EItemsState::EIS_MAX:
-		break;
-
-	default:
-		break;
-	}
-
+	SetItemProperties(OldState);
 }
 
 void APickUpBaseActor::PickUpItem()
@@ -244,6 +205,14 @@ void APickUpBaseActor::SwapItem()
 	//If Inventory full 
 	//Drop current and Equip new
 }
+
+
+//////////////////////////////////////
+/////
+/////           PICK UP ITEM
+////
+//////////////////////////////////////
+
 
 void APickUpBaseActor::EquipItem(APMCharacter* InPickupOwner)
 {
@@ -286,7 +255,11 @@ void APickUpBaseActor::Server_EquipItemActor_Implementation(APMCharacter* InPick
 }
 
 
-
+//////////////////////////////////////
+/////
+/////           DROP ITEM
+////
+//////////////////////////////////////
 
 void APickUpBaseActor::DropItem(APMCharacter* InPickUpOwner)
 {
@@ -295,7 +268,7 @@ void APickUpBaseActor::DropItem(APMCharacter* InPickUpOwner)
 		if (InPickUpOwner->HasAuthority())
 		{
 			StartDropItem();
-			SetItemState(EItemsState::EIS_Falling);
+			//SetItemState(EItemsState::EIS_Falling);
 		}
 
 		else
@@ -308,50 +281,81 @@ void APickUpBaseActor::DropItem(APMCharacter* InPickUpOwner)
 void APickUpBaseActor::StartDropItem()
 {
 	//On input button pressed 
-//Drop the item based on current subIndex
-
+	//Drop the item based on current subIndex
 	GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	SetItemState(EItemsState::EIS_Falling);
-	//ItemState = EItemsState::EIS_Falling;
-	/*
-	const FVector Location = GetActorLocation();
-	const FVector Forward = GetOwner()->GetActorForwardVector();
 
-	const float DropItemDistance = 150.0f;
-	const float DropItemTraceDistance = 10000.0f;
+	FRotator MeshRotation{ 0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f };
+	GetItemMesh()->SetWorldRotation(MeshRotation, false, nullptr, ETeleportType::TeleportPhysics);
+	const FVector Forwardmesh = GetItemMesh()->GetForwardVector();
+	const FVector RightMesh = GetItemMesh()->GetRightVector();
 
-	const FVector TraceStart = Location + Forward * DropItemDistance;
-	const FVector TraceEnd = TraceStart - FVector::UpVector * DropItemTraceDistance;
+	//Direction on which throw weapon
+	FVector ImpulseDirection = RightMesh.RotateAngleAxis(-20.0f, Forwardmesh);
 
-	TArray<AActor*> ActorsToIgnore = { GetOwner() };
-	FHitResult HitResult;
-	FVector TargetLocation = TraceEnd;
+	float RandomRotation = FMath::FRandRange(0.0f, 90.0f);
+	ImpulseDirection = ImpulseDirection.RotateAngleAxis(RandomRotation, FVector(0.f, 0.f, 1.f));
 
-	if (UKismetSystemLibrary::LineTraceSingleByProfile(this, TraceStart, TraceEnd, TEXT("WorldStatic"), true, ActorsToIgnore, EDrawDebugTrace::Persistent, HitResult, true))
-	{
-		if (HitResult.bBlockingHit)
-		{
-			TargetLocation = HitResult.Location;
-			SetActorLocation(HitResult.Location);
-		}
-	};
+	ImpulseDirection *= 10000.00f;
 
-	SetActorLocation(TraceEnd);
+	GetItemMesh()->AddImpulse(ImpulseDirection);
 
-
-	GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	GetSphereComps()->SetGenerateOverlapEvents(true);
-	GetBoxComps()->SetGenerateOverlapEvents(true);
-	*/
+	//ThrowItem();
+	
+	//
 }
-
 
 void APickUpBaseActor::Server_DropItem_Implementation()
 {
 	StartDropItem();
 }
 
+void APickUpBaseActor::ThrowItem()
+{
+	if (HasAuthority())
+	{
+		FRotator MeshRotation{ 0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f };
+		GetItemMesh()->SetWorldRotation(MeshRotation, false, nullptr, ETeleportType::TeleportPhysics);
+		const FVector Forwardmesh = GetItemMesh()->GetForwardVector();
+		const FVector RightMesh = GetItemMesh()->GetRightVector();
+
+		//Direction on which throw weapon
+		FVector ImpulseDirection = RightMesh.RotateAngleAxis(-20.0f, Forwardmesh);
+
+		float RandomRotation = FMath::FRandRange(0.0f, 90.0f);
+		ImpulseDirection = ImpulseDirection.RotateAngleAxis(RandomRotation, FVector(0.f, 0.f, 1.f));
+
+		ImpulseDirection *= 1000.00f;
+
+		//GetBoxComps()->AddImpulse(ImpulseDirection);
+
+		Server_ThrowItem(ImpulseDirection);
+		
+		GetWorldTimerManager().SetTimer(ThrowItemHandle, this, &APickUpBaseActor::StopFalling, ThrowItemTime);
+	}
+}
+
+void APickUpBaseActor::Server_ThrowItem_Implementation(const FVector& ImpulseVector)
+{
+	// Apply the impulse to the mesh
+	bItemFalling = true;
+	OnRep_ItemState(ItemState);
+	GetBoxComps()->AddImpulse(ImpulseVector);
+}
+
+void APickUpBaseActor::StopFalling()
+{
+	if (HasAuthority())
+	{
+		bItemFalling = false;
+		SetItemState(EItemsState::EIS_Pickup);
+	}
+	else
+	{
+		bItemFalling = false;
+		OnRep_ItemState(ItemState);
+	}
+}
 
 
 
@@ -536,3 +540,34 @@ void APickUpBaseActor::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent,
 
 
 
+/*
+	const FVector Location = GetActorLocation();
+	const FVector Forward = GetOwner()->GetActorForwardVector();
+
+	const float DropItemDistance = 150.0f;
+	const float DropItemTraceDistance = 10000.0f;
+
+	const FVector TraceStart = Location + Forward * DropItemDistance;
+	const FVector TraceEnd = TraceStart - FVector::UpVector * DropItemTraceDistance;
+
+	TArray<AActor*> ActorsToIgnore = { GetOwner() };
+	FHitResult HitResult;
+	FVector TargetLocation = TraceEnd;
+
+	if (UKismetSystemLibrary::LineTraceSingleByProfile(this, TraceStart, TraceEnd, TEXT("WorldStatic"), true, ActorsToIgnore, EDrawDebugTrace::Persistent, HitResult, true))
+	{
+		if (HitResult.bBlockingHit)
+		{
+			TargetLocation = HitResult.Location;
+			SetActorLocation(HitResult.Location);
+		}
+	};
+
+	SetActorLocation(TraceEnd);
+
+
+	GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	GetSphereComps()->SetGenerateOverlapEvents(true);
+	GetBoxComps()->SetGenerateOverlapEvents(true);
+	*/
