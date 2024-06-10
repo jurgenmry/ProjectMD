@@ -52,6 +52,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,  Category = "Components")
 	class UWidgetComponent* InteractW;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	UStaticMeshComponent* PickUpMesh;
+
+	FORCEINLINE UStaticMeshComponent* GetItemMesh() const { return PickUpMesh; }
+
 	/* Interact interface overrides */
 
 	virtual void BeginFocus() override;
@@ -61,7 +66,7 @@ public:
 	virtual void Interact(class APMCharacter* InInteractOwner) override;
 	//virtual void Interact_Implementation(const APMCharacter* InInteractOwner) override;
 
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/*For Inventory*/
 	virtual void PickUpItem() override {};

@@ -10,6 +10,8 @@
 #include "Components/SphereComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Net/UnrealNetwork.h"
 
 //Custome includes
 #include "UI/Widgets/PMBaseUserWidget.h" 
@@ -24,11 +26,19 @@ AInteractableActorBase::AInteractableActorBase()
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
+	PickUpMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickUpMesh"));
+	//PickUpMesh->SetupAttachment(GetRootComponent());
+	SetRootComponent(PickUpMesh);
+	PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PickUpMesh->SetIsReplicated(true);
+	PickUpMesh->SetSimulatePhysics(false);
+
 	BoxComps = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComps"));
 	//BoxComps->SetupAttachment(GetRootComponent());
 	BoxComps->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	BoxComps->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
-	SetRootComponent(BoxComps);
+	BoxComps->SetupAttachment(GetRootComponent());
+	//SetRootComponent(BoxComps);
 	BoxComps->SetHiddenInGame(true);
 	BoxComps->SetIsReplicated(true);
 
@@ -37,7 +47,6 @@ AInteractableActorBase::AInteractableActorBase()
 	SphereComps->SetupAttachment(GetRootComponent());
 	SphereComps->SetHiddenInGame(true);
 
-	
 
 	InteractW = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractW"));
 	InteractW->SetupAttachment(BoxComps);
@@ -106,6 +115,13 @@ void AInteractableActorBase::EndFocus()
 void AInteractableActorBase::Interact(APMCharacter* InInteractOwner)
 {
 	//EndFocus();
+}
+
+void AInteractableActorBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AInteractableActorBase, PickUpMesh);
 }
 
 

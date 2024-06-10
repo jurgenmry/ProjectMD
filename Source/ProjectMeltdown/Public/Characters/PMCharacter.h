@@ -81,8 +81,14 @@ public:
 	////////////////////////////////////////////////////////////////////
 
 
+	/* Swapping an Equipped item */
+	void SwapItem(APickUpBaseActor* ItemToSwap);
 
-	// FUNCTIONALITY IN SINGLE PLAYER
+	UFUNCTION(Server, Reliable)
+	void Server_SwapItem(APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap);
+
+
+	/* Equipping an Item */
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "CurentlyEquippedItem")
 	class APickUpBaseActor* EquippedItem; //For the currently Equipped Item
@@ -97,10 +103,15 @@ public:
 	void Server_EquipItem(APMCharacter* InCharacterOwener, UObject* InterfaceContext);
 
 
+
+	/* Dropping an Item */
 	void DropItem();
 
 	UFUNCTION(Server, Reliable)
 	void Server_DropItem(APMCharacter* InCharacterOwener);
+
+
+
 
 
 	/////////////////////////////////////////////////////////////////////

@@ -41,18 +41,15 @@ APickUpBaseActor::APickUpBaseActor()
 	SetReplicateMovement(true);
 	//SetPhysicsReplicationMode(EPhysicsReplicationMode::Default);
 
-	PickUpMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickUpMesh"));
-	PickUpMesh->SetupAttachment(GetRootComponent());
-	PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	PickUpMesh->SetIsReplicated(true);
-	PickUpMesh->SetSimulatePhysics(false);
 
-	GetBoxComps()->SetSimulatePhysics(true);
+
+	//GetBoxComps()->SetSimulatePhysics(true);
 }
 
 void APickUpBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	DOREPLIFETIME(APickUpBaseActor, PickUpMesh);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
 	DOREPLIFETIME(APickUpBaseActor, ItemState);
 	DOREPLIFETIME(APickUpBaseActor, bItemFalling);
 
@@ -108,11 +105,11 @@ void APickUpBaseActor::SetItemProperties(EItemsState State)
 	case EItemsState::EIS_Pickup:
 		
 		/*Set Mesh Properties*/
-		PickUpMesh->SetSimulatePhysics(false);
-		PickUpMesh->SetEnableGravity(false);
-		PickUpMesh->SetVisibility(true);
-		PickUpMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetItemMesh()->SetSimulatePhysics(false);
+		GetItemMesh()->SetEnableGravity(false);
+		GetItemMesh()->SetVisibility(true);
+		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 		/*Area Sphere properties*/
 		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
@@ -134,11 +131,11 @@ void APickUpBaseActor::SetItemProperties(EItemsState State)
 	case EItemsState::EIS_Equipped:
 
 		/*Set Mesh Properties*/
-		PickUpMesh->SetSimulatePhysics(false);
+		GetItemMesh()->SetSimulatePhysics(false);
 		//PickUpMesh->SetEnableGravity(false);
-		PickUpMesh->SetVisibility(true);
-		PickUpMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		PickUpMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetItemMesh()->SetVisibility(true);
+		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 		/*Area Sphere properties*/
 		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
@@ -154,12 +151,12 @@ void APickUpBaseActor::SetItemProperties(EItemsState State)
 
 		/*Set Mesh Properties*/
 
-		PickUpMesh->SetSimulatePhysics(true);
-		PickUpMesh->SetEnableGravity(true);
+		GetItemMesh()->SetSimulatePhysics(true);
+		GetItemMesh()->SetEnableGravity(true);
 
-		PickUpMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		PickUpMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		PickUpMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetItemMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
 
 		
 		
@@ -185,12 +182,12 @@ void APickUpBaseActor::SetItemProperties(EItemsState State)
 void APickUpBaseActor::SetItemState(EItemsState State)
 {
 	ItemState = State;
-	SetItemProperties(State);
+	OnRep_ItemState();
 }
 
-void APickUpBaseActor::OnRep_ItemState(EItemsState OldState)
+void APickUpBaseActor::OnRep_ItemState()
 {
-	SetItemProperties(OldState);
+	SetItemProperties(ItemState);
 }
 
 void APickUpBaseActor::PickUpItem()
@@ -282,7 +279,8 @@ void APickUpBaseActor::StartDropItem()
 {
 	//On input button pressed 
 	//Drop the item based on current subIndex
-	GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	// OPTION 1
+	/*GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	SetItemState(EItemsState::EIS_Falling);
 
 	FRotator MeshRotation{ 0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f };
@@ -296,13 +294,58 @@ void APickUpBaseActor::StartDropItem()
 	float RandomRotation = FMath::FRandRange(0.0f, 90.0f);
 	ImpulseDirection = ImpulseDirection.RotateAngleAxis(RandomRotation, FVector(0.f, 0.f, 1.f));
 
-	ImpulseDirection *= 10000.00f;
+	ImpulseDirection *= ImpulseThrow;
 
 	GetItemMesh()->AddImpulse(ImpulseDirection);
 
-	//ThrowItem();
-	
-	//
+	if (HasAuthority())
+	{
+		GetWorldTimerManager().SetTimer(ThrowItemHandle, this, &APickUpBaseActor::StopFalling, ThrowItemTime);
+	}
+	*/
+
+
+	//OPTION2
+	//GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	SetItemState(EItemsState::EIS_Falling);
+
+	if (APMBaseCharacter* ActorOwner = Cast<APMBaseCharacter>(this->GetAttachParentActor()))
+	{
+		const FVector Location = GetActorLocation();
+		const FVector Forward = ActorOwner->GetActorForwardVector();
+
+		const float DropItemDistance = ImpulseThrow;
+		const float DropItemTraceDistance = 10.0f;
+
+		const FVector TraceStart = Location + Forward * DropItemDistance;
+		const FVector TraceEnd = TraceStart - FVector::UpVector * DropItemTraceDistance;
+
+		TArray<AActor*> ActorsToIgnore = { this->GetAttachParentActor() };
+		FHitResult HitResult;
+		FVector TargetLocation = TraceEnd;
+
+		if (UKismetSystemLibrary::LineTraceSingleByProfile(this, TraceStart, TraceEnd, TEXT("WorldStatic"), true, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
+		{
+			if (HitResult.bBlockingHit)
+			{
+				TargetLocation = HitResult.Location;
+				GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+				this->SetActorLocation(HitResult.Location);
+			}
+			else
+			{
+				GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+				this->SetActorLocation(TraceEnd);
+			}
+		};
+
+		GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		this->SetActorLocation(TraceEnd);
+		if (HasAuthority())
+		{
+			GetWorldTimerManager().SetTimer(ThrowItemHandle, this, &APickUpBaseActor::StopFalling, ThrowItemTime);
+		}
+	}
 }
 
 void APickUpBaseActor::Server_DropItem_Implementation()
@@ -310,53 +353,17 @@ void APickUpBaseActor::Server_DropItem_Implementation()
 	StartDropItem();
 }
 
-void APickUpBaseActor::ThrowItem()
-{
-	if (HasAuthority())
-	{
-		FRotator MeshRotation{ 0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f };
-		GetItemMesh()->SetWorldRotation(MeshRotation, false, nullptr, ETeleportType::TeleportPhysics);
-		const FVector Forwardmesh = GetItemMesh()->GetForwardVector();
-		const FVector RightMesh = GetItemMesh()->GetRightVector();
-
-		//Direction on which throw weapon
-		FVector ImpulseDirection = RightMesh.RotateAngleAxis(-20.0f, Forwardmesh);
-
-		float RandomRotation = FMath::FRandRange(0.0f, 90.0f);
-		ImpulseDirection = ImpulseDirection.RotateAngleAxis(RandomRotation, FVector(0.f, 0.f, 1.f));
-
-		ImpulseDirection *= 1000.00f;
-
-		//GetBoxComps()->AddImpulse(ImpulseDirection);
-
-		Server_ThrowItem(ImpulseDirection);
-		
-		GetWorldTimerManager().SetTimer(ThrowItemHandle, this, &APickUpBaseActor::StopFalling, ThrowItemTime);
-	}
-}
-
-void APickUpBaseActor::Server_ThrowItem_Implementation(const FVector& ImpulseVector)
-{
-	// Apply the impulse to the mesh
-	bItemFalling = true;
-	OnRep_ItemState(ItemState);
-	GetBoxComps()->AddImpulse(ImpulseVector);
-}
 
 void APickUpBaseActor::StopFalling()
 {
-	if (HasAuthority())
-	{
-		bItemFalling = false;
-		SetItemState(EItemsState::EIS_Pickup);
-	}
-	else
-	{
-		bItemFalling = false;
-		OnRep_ItemState(ItemState);
-	}
+	SetItemState(EItemsState::EIS_Pickup);
+
 }
 
+void APickUpBaseActor::Server_StopFalling_Implementation()
+{
+	StopFalling();
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////

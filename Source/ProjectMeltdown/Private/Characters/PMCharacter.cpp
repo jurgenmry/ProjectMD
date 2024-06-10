@@ -371,6 +371,103 @@ void APMCharacter::Server_Interact_Implementation(UObject* InterfaceContext)//II
 //
 ////////////////////////////////////////////////////////////////////
 
+
+//New Testing code: 
+
+void APMCharacter::EquipItem()
+{
+	if (IsValid(TargetInteractable.GetObject()))
+	{
+		if (HasAuthority())
+		{
+			if (EquippedItem != Cast<APickUpBaseActor>(TargetInteractable.GetObject()))
+			{
+				SwapItem(Cast<APickUpBaseActor>(TargetInteractable.GetObject()));
+			}
+			else
+			{
+				TargetInteractable->EquipItem(this);
+			}
+		}
+		else
+		{
+			Server_EquipItem(this, TargetInteractable.GetObject());
+		}
+	}
+}
+
+bool APMCharacter::Server_EquipItem_Validate(APMCharacter* InCharacterOwner, UObject* InterfaceContext)
+{
+	return true;
+}
+
+void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwner, UObject* InterfaceContext)
+{
+	if (IInteractInterface* InteractInterface = Cast<IInteractInterface>(InterfaceContext))
+	{
+		if (EquippedItem != Cast<APickUpBaseActor>(InterfaceContext))
+		{
+			Server_SwapItem(InCharacterOwner, Cast<APickUpBaseActor>(InterfaceContext));
+		}
+		else
+		{
+			InteractInterface->EquipItem(InCharacterOwner);
+		}
+	}
+}
+
+void APMCharacter::DropItem()
+{
+	if (EquippedItem)
+	{
+		if (HasAuthority())
+		{
+			EquippedItem->DropItem(this);
+			SetEquippedItem(nullptr);
+		}
+		else
+		{
+			Server_DropItem(this);
+		}
+	}
+}
+
+void APMCharacter::Server_DropItem_Implementation(APMCharacter* InCharacterOwner)
+{
+	if (EquippedItem)
+	{
+		EquippedItem->DropItem(InCharacterOwner);
+		SetEquippedItem(nullptr);
+	}
+}
+
+void APMCharacter::SwapItem(APickUpBaseActor* ItemToSwap)
+{
+	if (HasAuthority())
+	{
+		DropItem();
+		ItemToSwap->EquipItem(this);
+	}
+	else
+	{
+		Server_SwapItem(this, ItemToSwap);
+	}
+}
+
+void APMCharacter::Server_SwapItem_Implementation(APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap)
+{
+	if (ItemToSwap)
+	{
+		DropItem();
+		ItemToSwap->EquipItem(InCharacterOwner);
+	}
+}
+
+
+
+/*Working Except for the last 2 fuctions*/
+
+/*
 void APMCharacter::EquipItem()
 {
 	if (IsValid(TargetInteractable.GetObject()))
@@ -420,14 +517,33 @@ void APMCharacter::DropItem()
 	}
 }
 
-
 void APMCharacter::Server_DropItem_Implementation(APMCharacter* InCharacterOwener)
 {
 	EquippedItem->DropItem(InCharacterOwener);
 	//SetEquippedItem(nullptr);
 }
 
+// Not working
+void APMCharacter::SwapItem(APickUpBaseActor* ItemToSwap)
+{
+	ItemToSwap->DropItem(this);
+	ItemToSwap->EquipItem(this);
+}
 
+void Server_SwapItem_Implementation(APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap)
+{
+	Server_DropItem(InCharacterOwner);
+	Server_EquipItem(InCharacterOwner, TargetInteractable.GetObject());
+}
+*/
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+
+
+//Old code
 /*
 void APMCharacter::EquipItem(APickUpBaseActor* ItemToEquip)
 {
