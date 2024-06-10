@@ -85,7 +85,8 @@ public:
 	void SwapItem(APickUpBaseActor* ItemToSwap);
 
 	UFUNCTION(Server, Reliable)
-	void Server_SwapItem(APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap);
+	void Server_SwapItem(APickUpBaseActor* ItemToSwap);//v2
+	//v1 void Server_SwapItem(APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap); 
 
 
 	/* Equipping an Item */
@@ -103,13 +104,19 @@ public:
 	void Server_EquipItem(APMCharacter* InCharacterOwener, UObject* InterfaceContext);
 
 
-
 	/* Dropping an Item */
 	void DropItem();
 
 	UFUNCTION(Server, Reliable)
-	void Server_DropItem(APMCharacter* InCharacterOwener);
+	void Server_DropItem(); //v2
+	//v1 void Server_DropItem(APMCharacter* InCharacterOwener);
 
+
+	/* Inventory itself */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated) 
+	TArray<APickUpBaseActor*> Inventory;
+
+	const int32 INVENTORY_CAPACITY{ 3 };
 
 
 

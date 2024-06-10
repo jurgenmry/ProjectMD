@@ -92,6 +92,7 @@ void APMCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	//DOREPLIFETIME(APMCharacter, CharacterInventory);
 
 	DOREPLIFETIME(APMCharacter, EquippedItem);
+	DOREPLIFETIME_CONDITION(APMCharacter, Inventory, COND_OwnerOnly);
 }
 
 int32 APMCharacter::GetPlayerlevel()
@@ -372,11 +373,74 @@ void APMCharacter::Server_Interact_Implementation(UObject* InterfaceContext)//II
 ////////////////////////////////////////////////////////////////////
 
 
-//New Testing code: 
+//New Testing code: Working Huyeeaahhh !
 
 void APMCharacter::EquipItem()
 {
+
 	if (IsValid(TargetInteractable.GetObject()))
+	{
+		APickUpBaseActor* ItemToEquip = Cast<APickUpBaseActor>(TargetInteractable.GetObject());
+		if (ItemToEquip)
+		{
+			if (HasAuthority())
+			{
+				Server_EquipItem(this, TargetInteractable.GetObject());
+			}
+			else
+			{
+				Server_EquipItem(this, TargetInteractable.GetObject());
+			}
+		}
+	}
+
+
+
+	//v2 . working only onserver. 
+	/* (IsValid(TargetInteractable.GetObject()))
+	{
+		APickUpBaseActor* ItemToEquip = Cast<APickUpBaseActor>(TargetInteractable.GetObject());
+		if (ItemToEquip)
+		{
+			if (HasAuthority())
+			{
+				if (EquippedItem != ItemToEquip)
+				{
+					if (Inventory.Num() < INVENTORY_CAPACITY)
+					{
+						if (EquippedItem)
+						{
+							Inventory.Add(EquippedItem);
+							EquippedItem->SetItemState(EItemsState::EIS_PickedUP);
+						}
+						ItemToEquip->EquipItem(this);
+					}
+					else // Inventory is full
+					{
+						SwapItem(ItemToEquip);
+					}
+
+				}
+				else
+				{
+					ItemToEquip->EquipItem(this);
+				}
+
+				// Add debug message to show the number of items in the inventory
+				FString DebugMessage = FString::Printf(TEXT("Inventory Count: %d"), Inventory.Num());
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DebugMessage);
+			}
+			else
+			{
+				Server_EquipItem(this, TargetInteractable.GetObject());
+			}
+		}
+	}*/
+
+
+
+	//Working with single object
+	/*if (IsValid(TargetInteractable.GetObject()))
 	{
 		if (HasAuthority())
 		{
@@ -384,7 +448,7 @@ void APMCharacter::EquipItem()
 			{
 				SwapItem(Cast<APickUpBaseActor>(TargetInteractable.GetObject()));
 			}
-			else
+			else 
 			{
 				TargetInteractable->EquipItem(this);
 			}
@@ -394,7 +458,11 @@ void APMCharacter::EquipItem()
 			Server_EquipItem(this, TargetInteractable.GetObject());
 		}
 	}
+	*/
 }
+
+
+
 
 bool APMCharacter::Server_EquipItem_Validate(APMCharacter* InCharacterOwner, UObject* InterfaceContext)
 {
@@ -403,6 +471,44 @@ bool APMCharacter::Server_EquipItem_Validate(APMCharacter* InCharacterOwner, UOb
 
 void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwner, UObject* InterfaceContext)
 {
+	
+	if (IInteractInterface* interactInterface = Cast<IInteractInterface>(InterfaceContext))
+	{
+		APickUpBaseActor* ItemToEquip = Cast<APickUpBaseActor>(InterfaceContext);
+		if (ItemToEquip)
+		{
+			if (InCharacterOwner->EquippedItem != ItemToEquip)
+			{
+				if (InCharacterOwner->Inventory.Num() < INVENTORY_CAPACITY)
+				{
+					if (InCharacterOwner->EquippedItem)
+					{
+						InCharacterOwner->Inventory.Add(InCharacterOwner->EquippedItem);
+						InCharacterOwner->EquippedItem->SetItemState(EItemsState::EIS_PickedUP);
+					}
+					ItemToEquip->EquipItem(InCharacterOwner);
+				}
+				else // Inventory is full
+				{
+					Server_SwapItem(ItemToEquip);
+				}
+			}
+			else
+			{
+				interactInterface->EquipItem(InCharacterOwner);
+			}
+		}
+	}
+	
+	
+	//v2 Working only on server
+	/*if (IInteractInterface* InteractInterface = Cast<IInteractInterface>(InterfaceContext))
+	{
+		InteractInterface->EquipItem(InCharacterOwner);
+	}*/
+	
+	//Working single Item
+	/* 
 	if (IInteractInterface* InteractInterface = Cast<IInteractInterface>(InterfaceContext))
 	{
 		if (EquippedItem != Cast<APickUpBaseActor>(InterfaceContext))
@@ -414,6 +520,7 @@ void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwne
 			InteractInterface->EquipItem(InCharacterOwner);
 		}
 	}
+	*/
 }
 
 void APMCharacter::DropItem()
@@ -422,27 +529,61 @@ void APMCharacter::DropItem()
 	{
 		if (HasAuthority())
 		{
-			EquippedItem->DropItem(this);
-			SetEquippedItem(nullptr);
+			Server_DropItem();
+			// working on server SetEquippedItem(nullptr);
 		}
 		else
 		{
-			Server_DropItem(this);
+			Server_DropItem();
 		}
 	}
 }
 
-void APMCharacter::Server_DropItem_Implementation(APMCharacter* InCharacterOwner)
+void APMCharacter::Server_DropItem_Implementation()//v 1APMCharacter* InCharacterOwner)
 {
+	
+	if (EquippedItem)
+	{
+		EquippedItem->DropItem(this);
+		EquippedItem = nullptr;
+	}
+
+
+
+	//Version 2 working only on server
+	/*
 	if (EquippedItem)
 	{
 		EquippedItem->DropItem(InCharacterOwner);
 		SetEquippedItem(nullptr);
 	}
+	*/
 }
 
 void APMCharacter::SwapItem(APickUpBaseActor* ItemToSwap)
 {
+
+	if (HasAuthority())
+	{
+		Server_SwapItem(ItemToSwap);
+	}
+	else
+	{
+		Server_SwapItem(ItemToSwap);
+	}
+
+
+	//Working only on the server
+	/*
+	if (EquippedItem)
+	{
+		EquippedItem->DropItem(this);
+	}
+	ItemToSwap->EquipItem(this);
+	*/
+
+	//Working single item
+	/*
 	if (HasAuthority())
 	{
 		DropItem();
@@ -452,15 +593,32 @@ void APMCharacter::SwapItem(APickUpBaseActor* ItemToSwap)
 	{
 		Server_SwapItem(this, ItemToSwap);
 	}
+	*/
 }
 
-void APMCharacter::Server_SwapItem_Implementation(APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap)
+void APMCharacter::Server_SwapItem_Implementation(APickUpBaseActor* ItemToSwap)//v1 APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap)
 {
+
+	if (EquippedItem)
+	{
+		EquippedItem->DropItem(this);
+	}
+	EquippedItem = ItemToSwap;
+	ItemToSwap->EquipItem(this);
+	
+	
+	//Working only on server
+	/*Server_DropItem(InCharacterOwner);
+	Server_EquipItem(InCharacterOwner, ItemToSwap);*/
+	
+	//Working single item
+	/*
 	if (ItemToSwap)
 	{
 		DropItem();
 		ItemToSwap->EquipItem(InCharacterOwner);
 	}
+	*/
 }
 
 

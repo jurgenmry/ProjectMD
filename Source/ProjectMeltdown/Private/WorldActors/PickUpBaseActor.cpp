@@ -126,13 +126,30 @@ void APickUpBaseActor::SetItemProperties(EItemsState State)
 		break;
 
 	case EItemsState::EIS_PickedUP:
+
+		/*Set Mesh Properties*/
+		GetItemMesh()->SetSimulatePhysics(false);
+		GetItemMesh()->SetEnableGravity(false);
+		GetItemMesh()->SetVisibility(false);
+		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		/*Area Sphere properties*/
+		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		/*Box Properties properties*/
+		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+
 		break;
 
 	case EItemsState::EIS_Equipped:
 
 		/*Set Mesh Properties*/
 		GetItemMesh()->SetSimulatePhysics(false);
-		//PickUpMesh->SetEnableGravity(false);
+		GetItemMesh()->SetEnableGravity(false);
 		GetItemMesh()->SetVisibility(true);
 		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
