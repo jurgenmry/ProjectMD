@@ -19,15 +19,17 @@ class PROJECTMELTDOWN_API APMCharacter : public APMBaseCharacter
 
 	APMCharacter();
 
+
+
+public:
+
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	USkeletalMeshComponent* Mesh1P;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-
-public:
 
 	virtual void BeginPlay() override;
 
