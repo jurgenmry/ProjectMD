@@ -52,6 +52,7 @@ void APickUpBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	
 	DOREPLIFETIME(APickUpBaseActor, ItemState);
 	DOREPLIFETIME(APickUpBaseActor, bItemFalling);
+	DOREPLIFETIME(APickUpBaseActor, SlotItemIndex);
 
 }
 
@@ -240,7 +241,7 @@ void APickUpBaseActor::EquipItem(APMCharacter* InPickupOwner)
 
 		else
 		{
-			Server_EquipItemActor_Implementation(InPickupOwner);
+			Server_EquipItemActor_Implementation(InPickupOwner); //Server_EquipItemActor(InPickupOwner); //
 		}
 	}
 }

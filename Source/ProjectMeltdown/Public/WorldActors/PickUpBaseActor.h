@@ -139,19 +139,23 @@ public:
 	UPROPERTY(Replicated)
 	bool bItemFalling{false};
 
-	
-	
+
 	void StopFalling();
 
 	UFUNCTION(Server, Reliable)
 	void Server_StopFalling();
 
 	
-
+	/* Swap functionality */
 	virtual void SwapItem() override;
 	virtual void PickUpItem() override;
 	
+	/*Slot of the index in the inventory*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	int32 SlotItemIndex {0};
 
+	FORCEINLINE int32 GetSlotIndex() const { return SlotItemIndex; }
+	FORCEINLINE void SetSlotIndex(int32 Index) { SlotItemIndex = Index; }
 
 	
 

@@ -10,7 +10,6 @@
 class USkeletalMeshComponent;
 class UCameraComponent;
 
-
 UCLASS()
 class PROJECTMELTDOWN_API APMCharacter : public APMBaseCharacter
 {
@@ -82,6 +81,38 @@ public:
 	//
 	////////////////////////////////////////////////////////////////////
 
+	/* Inventory itself */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated)
+	TArray<APickUpBaseActor*> Inventory;
+
+	const int32 INVENTORY_CAPACITY{ 3 };
+
+
+	/* Equipping an Item */
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "CurentlyEquippedItem")
+	class APickUpBaseActor* EquippedItem; //For the currently Equipped Item
+
+	FORCEINLINE void SetEquippedItem(APickUpBaseActor* NewItem) { EquippedItem = NewItem; }
+	FORCEINLINE APickUpBaseActor* GetEquippedItem() { return EquippedItem; }
+
+	UFUNCTION(BlueprintCallable)
+	void EquipItem();
+
+	
+	//void Server_EquipItem(APickUpBaseActor* ItemToEquip);
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_EquipItem(APMCharacter* InCharacterOwener, UObject* InterfaceContext);
+
+
+	/* Dropping an Item */
+	void DropItem();
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem(APMCharacter* InCharacterOwener);
+	//void Server_DropItem(); //v2
+	
+
 
 	/* Swapping an Equipped item */
 	void SwapItem(APickUpBaseActor* ItemToSwap);
@@ -91,46 +122,33 @@ public:
 	//v1 void Server_SwapItem(APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap); 
 
 
-	/* Equipping an Item */
+	/* Swapping the items based on Key Press */
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "CurentlyEquippedItem")
-	class APickUpBaseActor* EquippedItem; //For the currently Equipped Item
-
-	FORCEINLINE void SetEquippedItem(APickUpBaseActor* NewItem){ EquippedItem = NewItem; }
-	FORCEINLINE APickUpBaseActor* GetEquippedItem() { return EquippedItem; }
-
-	UFUNCTION(BlueprintCallable, Category = "Item")
-	void EquipItem(); /* Takes an Item attach it to mesh*/
-
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_EquipItem(APMCharacter* InCharacterOwener, UObject* InterfaceContext);
-
-
-	/* Dropping an Item */
-	void DropItem();
+	UFUNCTION(BlueprintCallable)
+	void ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex);
 
 	UFUNCTION(Server, Reliable)
-	void Server_DropItem(); //v2
-	//v1 void Server_DropItem(APMCharacter* InCharacterOwener);
+	void Server_ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex);
 
 
-	/* Inventory itself */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated) 
-	TArray<APickUpBaseActor*> Inventory;
+	/* Key Press functionality */
 
-	const int32 INVENTORY_CAPACITY{ 3 };
+	UFUNCTION(BlueprintCallable)
+	void OneKeyPressedCharacter();
+
+	UFUNCTION(BlueprintCallable)
+	void TwoKeyPressedCharacter();
+
+	UFUNCTION(BlueprintCallable)
+	void ThreeKeyPressedCharacter();
+
+	UFUNCTION(BlueprintCallable)
+	void FourKeyPressedCharacter();
 
 
 
-
-	/////////////////////////////////////////////////////////////////////
-	//
-	//                  CODE PART FOR OLD INVENTORY 
-	//
-	////////////////////////////////////////////////////////////////////
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
-	//class UInventoryComponent* CharacterInventory = nullptr;
+	//UPROPERTY(BlueprintAssignable) //Delegate to send information about the slot index to inventory bar
+	//FEquippedItemDelegate EquippedItemDelegate;
 
 
 protected:
@@ -146,5 +164,15 @@ protected:
 	void TraceForItems();
 	bool PerformTrace(FHitResult& OutHitResult, FVector& OutHitLocation);
 
+
+
+	/////////////////////////////////////////////////////////////////////
+	//
+	//                  CODE PART FOR OLD INVENTORY 
+	//
+	////////////////////////////////////////////////////////////////////
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	//class UInventoryComponent* CharacterInventory = nullptr;
 
 };

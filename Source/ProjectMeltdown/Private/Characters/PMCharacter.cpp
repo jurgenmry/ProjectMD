@@ -105,7 +105,6 @@ int32 APMCharacter::GetPlayerlevel()
 	return 1;
 }
 
-
 void APMCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
@@ -375,6 +374,8 @@ void APMCharacter::Server_Interact_Implementation(UObject* InterfaceContext)//II
 
 //New Testing code: Working Huyeeaahhh !
 
+/* Equip An Item */
+
 void APMCharacter::EquipItem()
 {
 
@@ -385,7 +386,7 @@ void APMCharacter::EquipItem()
 		{
 			if (HasAuthority())
 			{
-				Server_EquipItem(this, TargetInteractable.GetObject());
+				Server_EquipItem(this, TargetInteractable.GetObject()); 
 			}
 			else
 			{
@@ -438,7 +439,6 @@ void APMCharacter::EquipItem()
 	}*/
 
 
-
 	//Working with single object
 	/*if (IsValid(TargetInteractable.GetObject()))
 	{
@@ -461,17 +461,15 @@ void APMCharacter::EquipItem()
 	*/
 }
 
-
-
-
-bool APMCharacter::Server_EquipItem_Validate(APMCharacter* InCharacterOwner, UObject* InterfaceContext)
+bool APMCharacter::Server_EquipItem_Validate(APMCharacter* InCharacterOwner, UObject* InterfaceContext) 
 {
 	return true;
 }
-
-void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwner, UObject* InterfaceContext)
+ 
+void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwner, UObject* InterfaceContext) 
 {
 	
+	//v3 Working Properly replicated. Do not work with input
 	if (IInteractInterface* interactInterface = Cast<IInteractInterface>(InterfaceContext))
 	{
 		APickUpBaseActor* ItemToEquip = Cast<APickUpBaseActor>(InterfaceContext);
@@ -500,7 +498,6 @@ void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwne
 		}
 	}
 	
-	
 	//v2 Working only on server
 	/*if (IInteractInterface* InteractInterface = Cast<IInteractInterface>(InterfaceContext))
 	{
@@ -523,23 +520,25 @@ void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwne
 	*/
 }
 
+/* Dropping An Item */
+
 void APMCharacter::DropItem()
 {
 	if (EquippedItem)
 	{
 		if (HasAuthority())
 		{
-			Server_DropItem();
+			Server_DropItem(this);
 			// working on server SetEquippedItem(nullptr);
 		}
 		else
 		{
-			Server_DropItem();
+			Server_DropItem(this);
 		}
-	}
+	}	
 }
 
-void APMCharacter::Server_DropItem_Implementation()//v 1APMCharacter* InCharacterOwner)
+void APMCharacter::Server_DropItem_Implementation(APMCharacter* InCharacterOwner)
 {
 	
 	if (EquippedItem)
@@ -547,8 +546,7 @@ void APMCharacter::Server_DropItem_Implementation()//v 1APMCharacter* InCharacte
 		EquippedItem->DropItem(this);
 		EquippedItem = nullptr;
 	}
-
-
+	
 
 	//Version 2 working only on server
 	/*
@@ -559,6 +557,9 @@ void APMCharacter::Server_DropItem_Implementation()//v 1APMCharacter* InCharacte
 	}
 	*/
 }
+
+
+/* Swapping An Item */
 
 void APMCharacter::SwapItem(APickUpBaseActor* ItemToSwap)
 {
@@ -620,6 +621,107 @@ void APMCharacter::Server_SwapItem_Implementation(APickUpBaseActor* ItemToSwap)/
 	}
 	*/
 }
+
+
+/* Exchange Inventory Based on Key press */
+
+void APMCharacter::ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex)
+{
+
+	if (CurrentItemIndex == NewItemIndex || NewItemIndex >= Inventory.Num() || !Inventory.IsValidIndex(NewItemIndex))
+	{
+		return;
+	}
+
+	APickUpBaseActor* OldEquippedItem = EquippedItem;
+	APickUpBaseActor* NewItem = Inventory[NewItemIndex];
+
+	if (OldEquippedItem)
+	{
+		OldEquippedItem->SetItemState(EItemsState::EIS_PickedUP);
+		OldEquippedItem->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		Inventory[CurrentItemIndex] = OldEquippedItem;
+	}
+
+	if (NewItem)
+	{
+		NewItem->SetItemState(EItemsState::EIS_Equipped);
+		NewItem->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("HandSocket"));
+		EquippedItem = NewItem;
+		Inventory[NewItemIndex] = nullptr;
+	}
+
+	if (!HasAuthority())
+	{
+		Server_ExchangeInventoryItems(CurrentItemIndex, NewItemIndex);
+	}
+
+	//Sort of working.
+	/*
+	if ((CurrentItemIndex == NewItemIndex) || NewItemIndex >= Inventory.Num()) return;
+
+	auto OldEquippedItem = EquippedItem;
+	auto NewItem = Cast<APickUpBaseActor>(Inventory[NewItemIndex]);
+
+	if (OldEquippedItem)
+	{
+		OldEquippedItem->SetItemState(EItemsState::EIS_PickedUP);
+		Inventory[CurrentItemIndex] = OldEquippedItem;
+	}
+
+	NewItem->SetItemState(EItemsState::EIS_Equipped);
+	EquippedItem = NewItem;
+
+	Inventory[NewItemIndex] = nullptr; // Optional, to remove the reference
+	if (!HasAuthority())
+	{
+		Server_ExchangeInventoryItems(CurrentItemIndex, NewItemIndex);
+	}
+	*/
+}
+
+void APMCharacter::Server_ExchangeInventoryItems_Implementation(int32 CurrentItemIndex, int32 NewItemIndex)
+{
+	ExchangeInventoryItems(CurrentItemIndex, NewItemIndex);
+}
+
+void APMCharacter::OneKeyPressedCharacter()
+{
+	if (EquippedItem && EquippedItem->GetSlotIndex() == 0) return;
+	if (Inventory.IsValidIndex(0) && Inventory[0])
+	{
+		ExchangeInventoryItems(EquippedItem ? EquippedItem->GetSlotIndex() : -1, 0);
+	}
+}
+
+void APMCharacter::TwoKeyPressedCharacter()
+{
+	if (EquippedItem && EquippedItem->GetSlotIndex() == 1) return;
+	if (Inventory.IsValidIndex(1) && Inventory[1])
+	{
+		ExchangeInventoryItems(EquippedItem ? EquippedItem->GetSlotIndex() : -1, 1);
+	}
+}
+
+void APMCharacter::ThreeKeyPressedCharacter()
+{
+	if (EquippedItem && EquippedItem->GetSlotIndex() == 2) return;
+	if (Inventory.IsValidIndex(2) && Inventory[2])
+	{
+		ExchangeInventoryItems(EquippedItem ? EquippedItem->GetSlotIndex() : -1, 2);
+	}
+}
+
+void APMCharacter::FourKeyPressedCharacter()
+{
+	if (EquippedItem && EquippedItem->GetSlotIndex() == 3) return;
+	if (Inventory.IsValidIndex(3) && Inventory[3])
+	{
+		ExchangeInventoryItems(EquippedItem ? EquippedItem->GetSlotIndex() : -1, 3);
+	}
+}
+
+
 
 
 

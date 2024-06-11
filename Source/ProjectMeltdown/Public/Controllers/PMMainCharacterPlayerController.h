@@ -50,6 +50,20 @@ private:
 	TObjectPtr <UInputAction> DropItemAction;
 
 
+	/*Swap items in inventory */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr <UInputAction> OneKeyPressedAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr <UInputAction> TwoKeyPressedAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr <UInputAction> ThreeKeyPressedAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr <UInputAction> FourKeyPressedAction;
+
+
 	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr <UInputAction> DropItemAction;
@@ -78,6 +92,14 @@ protected:
 	void InteractWithObject();
 
 	void DropEquippedItem();
+
+	/* Select Item */
+
+	void OneKeyPressed();
+	void TwoKeyPressed();
+	void ThreeKeyPressed();
+	void FourKeyPressed();
+
 
 	/*
 	void OnDropItemAction(const FInputActionValue& Value);

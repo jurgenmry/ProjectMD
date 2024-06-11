@@ -51,9 +51,15 @@ void APMMainCharacterPlayerController::SetupInputComponent()
 		// Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::InteractWithObject);
 
-
 		//DropItem
 		EnhancedInputComponent->BindAction(DropItemAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::DropEquippedItem);
+
+		/* Accesing the character's inventory */
+
+		EnhancedInputComponent->BindAction(OneKeyPressedAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::OneKeyPressed);
+		EnhancedInputComponent->BindAction(TwoKeyPressedAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::TwoKeyPressed);
+		EnhancedInputComponent->BindAction(ThreeKeyPressedAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::ThreeKeyPressed);
+		EnhancedInputComponent->BindAction(FourKeyPressedAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::FourKeyPressed);
 
 		/*
 		//EquipItem
@@ -127,6 +133,41 @@ void APMMainCharacterPlayerController::DropEquippedItem()
 		return;
 	ControlledCharacter->DropItem();//Interact();
 }
+
+
+void APMMainCharacterPlayerController::OneKeyPressed()
+{
+	APMCharacter* ControlledCharacter = Cast<APMCharacter>(GetCharacter());//GetPawn<APMCharacter>();
+	if (!IsValid(ControlledCharacter))
+		return;
+	ControlledCharacter->OneKeyPressedCharacter();
+}
+
+void APMMainCharacterPlayerController::TwoKeyPressed()
+{
+	APMCharacter* ControlledCharacter = Cast<APMCharacter>(GetCharacter());//GetPawn<APMCharacter>();
+	if (!IsValid(ControlledCharacter))
+		return;
+	ControlledCharacter->TwoKeyPressedCharacter();
+}
+
+void APMMainCharacterPlayerController::ThreeKeyPressed()
+{
+	APMCharacter* ControlledCharacter = Cast<APMCharacter>(GetCharacter());//GetPawn<APMCharacter>();
+	if (!IsValid(ControlledCharacter))
+		return;
+	ControlledCharacter->ThreeKeyPressedCharacter();
+}
+
+void APMMainCharacterPlayerController::FourKeyPressed()
+{
+	APMCharacter* ControlledCharacter = Cast<APMCharacter>(GetCharacter());//GetPawn<APMCharacter>();
+	if (!IsValid(ControlledCharacter))
+		return;
+	ControlledCharacter->FourKeyPressedCharacter();
+}
+
+
 
 
 
