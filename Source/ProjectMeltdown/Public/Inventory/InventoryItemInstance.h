@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayAbilitySpec.h"
+#include "WorldActors/InteractableActorBase.h"
 #include "InventoryItemInstance.generated.h"
 
 
 class UItemStaticData;
-class APickUpBaseActor;
+class AInteractableActorBase;
+
 
 UCLASS(BlueprintType, Blueprintable)
 class PROJECTMELTDOWN_API UInventoryItemInstance : public UObject
@@ -17,9 +20,9 @@ class PROJECTMELTDOWN_API UInventoryItemInstance : public UObject
 
 public:
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void Init(TSubclassOf<UItemStaticData> InItemStaticDataClass, int32 InQuantity = 1);
 
-	virtual void Init(TSubclassOf<UItemStaticData> InItemDataClass);
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual bool IsSupportedForNetworking() const override { return true; }
 
@@ -30,20 +33,44 @@ public:
 	TSubclassOf<UItemStaticData> ItemDataClass;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Equipped)
-	bool Equipped = false;
+	bool bEquipped = false;
 	
 	UFUNCTION()
 	void OnRep_Equipped();
 
 
 	virtual void OnEquipped(AActor* InOwner = nullptr);
-	virtual void OnUnEquipped();
-	virtual void OnDropItem();
+	virtual void OnUnEquipped(AActor* InOwner = nullptr);
+	virtual void OnDropItem(AActor* InOwner = nullptr);
+
+
+	UFUNCTION(BlueprintPure)
+	AInteractableActorBase* GetItemActor() const;
+
+	int32 GetQuantity() const { return Quantity; }
+
+	void AddItems(int32 Count);
 
 
 protected:
 
 	UPROPERTY(Replicated)
-	APickUpBaseActor* ItemActor = nullptr;
+	AInteractableActorBase* ItemActor = nullptr;
+
+	UPROPERTY(Replicated)
+	int32 Quantity = 1;
+
+	void TryGrantAbilities(AActor* InOwner);
+
+	void TryRemoveAbilities(AActor* InOwner);
+
+	void TryApplyEffects(AActor* InOwner);
+
+	void TryRemoveEffects(AActor* InOwner);
+
+	UPROPERTY()
+	TArray<FGameplayAbilitySpecHandle> GrantedAbilityHandles;
+
+	TArray<FActiveGameplayEffectHandle> OngoingEffectHandles;
 
 };

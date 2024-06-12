@@ -32,7 +32,7 @@
 #include "Characters/PMCharacter.h"
 
 
-
+/*
 APickUpBaseActor::APickUpBaseActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,8 +45,9 @@ APickUpBaseActor::APickUpBaseActor()
 
 	//GetBoxComps()->SetSimulatePhysics(true);
 }
+*/
 
-void APickUpBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+/*void APickUpBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
@@ -54,172 +55,171 @@ void APickUpBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(APickUpBaseActor, bItemFalling);
 	DOREPLIFETIME(APickUpBaseActor, SlotItemIndex);
 
-}
-
+}*/
+/*
 void APickUpBaseActor::BeginPlay()
 {
 	Super::BeginPlay();
 	SetItemProperties(ItemState);
-}
+}*/
 
-void APickUpBaseActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	/*
-	if (GetItemState() == EItemsState::EIS_Falling && bItemFalling)
-	{
-		if(HasAuthority())
-		{
-
-		}
-	}
-	*/
-}
-
-
-
-void APickUpBaseActor::Interact(APMCharacter* InInteractOwner)
-{
-	Super::Interact(InInteractOwner);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Entering actor interactable")), 1);
-
-	if (InInteractOwner)
-	{
-		if (InInteractOwner->IsLocallyControlled())
-		{
-			//UI Stuff
-		}
-		if (HasAuthority())
-		{
-			//InInteractOwner->AddItemToInventory(this);
-			//InInteractOwner->EquipItem(this);
-			//Destroy();
-		}
-	}
-}
-
-void APickUpBaseActor::SetItemProperties(EItemsState State)
-{
-	switch (State)
-	{
-	case EItemsState::EIS_Pickup:
-		
-		/*Set Mesh Properties*/
-		GetItemMesh()->SetSimulatePhysics(false);
-		GetItemMesh()->SetEnableGravity(false);
-		GetItemMesh()->SetVisibility(true);
-		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		/*Area Sphere properties*/
-		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
-		/*Box Properties properties*/
-		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetBoxComps()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
-		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
-		break;
-
-	case EItemsState::EIS_EquipInterping:
-		break;
-
-	case EItemsState::EIS_PickedUP:
-
-		/*Set Mesh Properties*/
-		GetItemMesh()->SetSimulatePhysics(false);
-		GetItemMesh()->SetEnableGravity(false);
-		GetItemMesh()->SetVisibility(false);
-		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		/*Area Sphere properties*/
-		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		/*Box Properties properties*/
-		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//void APickUpBaseActor::Tick(float DeltaTime)
+//{
+	//Super::Tick(DeltaTime);
+//
+//	/*
+//	if (GetItemState() == EItemsState::EIS_Falling && bItemFalling)
+//	{
+//		if(HasAuthority())
+//		{
+//
+//		}
+//	}
+//	*/
+//}
 
 
-		break;
+//void APickUpBaseActor::Interact(APMCharacter* InInteractOwner)
+//{
+//	Super::Interact(InInteractOwner);
+//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan, FString::Printf(TEXT("Entering actor interactable")), 1);
+//
+//	if (InInteractOwner)
+//	{
+//		if (InInteractOwner->IsLocallyControlled())
+//		{
+//			//UI Stuff
+//		}
+//		if (HasAuthority())
+//		{
+//			//InInteractOwner->AddItemToInventory(this);
+//			//InInteractOwner->EquipItem(this);
+//			//Destroy();
+//		}
+//	}
+//}
 
-	case EItemsState::EIS_Equipped:
+//void APickUpBaseActor::SetItemProperties(EItemsState State)
+//{
+//	switch (State)
+//	{
+//	case EItemsState::EIS_Pickup:
+//		
+//		/*Set Mesh Properties*/
+//		GetItemMesh()->SetSimulatePhysics(false);
+//		GetItemMesh()->SetEnableGravity(false);
+//		GetItemMesh()->SetVisibility(true);
+//		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//		/*Area Sphere properties*/
+//		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+//		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+//
+//		/*Box Properties properties*/
+//		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetBoxComps()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+//		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+//
+//		break;
+//
+//	case EItemsState::EIS_EquipInterping:
+//		break;
+//
+//	case EItemsState::EIS_PickedUP:
+//
+//		/*Set Mesh Properties*/
+//		GetItemMesh()->SetSimulatePhysics(false);
+//		GetItemMesh()->SetEnableGravity(false);
+//		GetItemMesh()->SetVisibility(false);
+//		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//		/*Area Sphere properties*/
+//		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//		/*Box Properties properties*/
+//		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//
+//		break;
+//
+//	case EItemsState::EIS_Equipped:
+//
+//		/*Set Mesh Properties*/
+//		GetItemMesh()->SetSimulatePhysics(false);
+//		GetItemMesh()->SetEnableGravity(false);
+//		GetItemMesh()->SetVisibility(true);
+//		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//		/*Area Sphere properties*/
+//		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//		/*Box Properties properties*/
+//		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//		break;
+//
+//	case EItemsState::EIS_Falling:
+//
+//		/*Set Mesh Properties*/
+//
+//		GetItemMesh()->SetSimulatePhysics(true);
+//		GetItemMesh()->SetEnableGravity(true);
+//
+//		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+//		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetItemMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+//
+//		
+//		
+//		/*Area Sphere properties*/
+//		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//		/*Box Properties properties*/
+//		//GetBoxComps()->SetSimulatePhysics(true);
+//		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+//		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//
+//		break;
+//
+//	case EItemsState::EIS_MAX:
+//		break;
+//
+//	default:
+//		break;
+//	}
+//}
 
-		/*Set Mesh Properties*/
-		GetItemMesh()->SetSimulatePhysics(false);
-		GetItemMesh()->SetEnableGravity(false);
-		GetItemMesh()->SetVisibility(true);
-		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//void APickUpBaseActor::SetItemState(EItemsState State)
+//{
+//	ItemState = State;
+//	OnRep_ItemState();
+//}
 
-		/*Area Sphere properties*/
-		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//void APickUpBaseActor::OnRep_ItemState()
+//{
+//	SetItemProperties(ItemState);
+//}
 
-		/*Box Properties properties*/
-		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+//void APickUpBaseActor::PickUpItem()
+//{
+//	//check the array
+//	//If bigger than array amount then swap
+//	//Other wise pick up the item 
+//}
 
-		break;
-
-	case EItemsState::EIS_Falling:
-
-		/*Set Mesh Properties*/
-
-		GetItemMesh()->SetSimulatePhysics(true);
-		GetItemMesh()->SetEnableGravity(true);
-
-		GetItemMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		GetItemMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetItemMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
-
-		
-		
-		/*Area Sphere properties*/
-		GetSphereComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetSphereComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		/*Box Properties properties*/
-		//GetBoxComps()->SetSimulatePhysics(true);
-		GetBoxComps()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		GetBoxComps()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		break;
-
-	case EItemsState::EIS_MAX:
-		break;
-
-	default:
-		break;
-	}
-}
-
-void APickUpBaseActor::SetItemState(EItemsState State)
-{
-	ItemState = State;
-	OnRep_ItemState();
-}
-
-void APickUpBaseActor::OnRep_ItemState()
-{
-	SetItemProperties(ItemState);
-}
-
-void APickUpBaseActor::PickUpItem()
-{
-	//check the array
-	//If bigger than array amount then swap
-	//Other wise pick up the item 
-}
-
-void APickUpBaseActor::SwapItem()
-{
-	//If Inventory full 
-	//Drop current and Equip new
-}
+//void APickUpBaseActor::SwapItem()
+//{
+//	//If Inventory full 
+//	//Drop current and Equip new
+//}
 
 
 //////////////////////////////////////
@@ -229,46 +229,45 @@ void APickUpBaseActor::SwapItem()
 //////////////////////////////////////
 
 
-void APickUpBaseActor::EquipItem(APMCharacter* InPickupOwner)
-{
-	if (InPickupOwner)
-	{
-		if(InPickupOwner->HasAuthority())
-		{
-			StartPickUp(InPickupOwner);
-			SetItemState(EItemsState::EIS_Equipped);
-		}
+//void APickUpBaseActor::EquipItem(APMCharacter* InPickupOwner)
+//{
+//	if (InPickupOwner)
+//	{
+//		if(InPickupOwner->HasAuthority())
+//		{
+//			StartPickUp(InPickupOwner);
+//			SetItemState(EItemsState::EIS_Equipped);
+//		}
+//
+//		else
+//		{
+//			Server_EquipItemActor_Implementation(InPickupOwner); //Server_EquipItemActor(InPickupOwner); //
+//		}
+//	}
+//}
 
-		else
-		{
-			Server_EquipItemActor_Implementation(InPickupOwner); //Server_EquipItemActor(InPickupOwner); //
-		}
-	}
-}
+//void APickUpBaseActor::StartPickUp(APMCharacter* InPickUpOwner)
+//{
+//	const USkeletalMeshSocket* HandSocket = InPickUpOwner->GetMesh1P()->GetSocketByName(FName("ItemSocket"));
+//	if (HandSocket)
+//	{
+//		//GetRootComponent()->AttachToComponent(InPickUpOwner->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("ItemSocket"));
+//		
+//		HandSocket->AttachActor(this, InPickUpOwner->GetMesh1P());
+//	}
+//	
+//	InPickUpOwner->SetEquippedItem(this);
+//}
 
-void APickUpBaseActor::StartPickUp(APMCharacter* InPickUpOwner)
-{
-	const USkeletalMeshSocket* HandSocket = InPickUpOwner->GetMesh1P()->GetSocketByName(FName("ItemSocket"));
-	if (HandSocket)
-	{
-		//GetRootComponent()->AttachToComponent(InPickUpOwner->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("ItemSocket"));
-		
-		HandSocket->AttachActor(this, InPickUpOwner->GetMesh1P());
-	}
-	
-	InPickUpOwner->SetEquippedItem(this);
-}
+//bool APickUpBaseActor::Server_EquipItemActor_Validate(APMCharacter* InPickUpOwner)
+//{
+//	return true;
+//}
 
-bool APickUpBaseActor::Server_EquipItemActor_Validate(APMCharacter* InPickUpOwner)
-{
-	return true;
-}
-
-void APickUpBaseActor::Server_EquipItemActor_Implementation(APMCharacter* InPickUpOwner)
-{
-	StartPickUp(InPickUpOwner);
-}
-
+//void APickUpBaseActor::Server_EquipItemActor_Implementation(APMCharacter* InPickUpOwner)
+//{
+//	StartPickUp(InPickUpOwner);
+//}
 
 //////////////////////////////////////
 /////
@@ -276,112 +275,112 @@ void APickUpBaseActor::Server_EquipItemActor_Implementation(APMCharacter* InPick
 ////
 //////////////////////////////////////
 
-void APickUpBaseActor::DropItem(APMCharacter* InPickUpOwner)
-{
-	if (InPickUpOwner)
-	{
-		if (InPickUpOwner->HasAuthority())
-		{
-			StartDropItem();
-			//SetItemState(EItemsState::EIS_Falling);
-		}
+//void APickUpBaseActor::DropItem(APMCharacter* InPickUpOwner)
+//{
+//	if (InPickUpOwner)
+//	{
+//		if (InPickUpOwner->HasAuthority())
+//		{
+//			StartDropItem();
+//			//SetItemState(EItemsState::EIS_Falling);
+//		}
+//
+//		else
+//		{
+//			Server_DropItem_Implementation();
+//		}
+//	}
+//}
 
-		else
-		{
-			Server_DropItem_Implementation();
-		}
-	}
-}
+//void APickUpBaseActor::StartDropItem()
+//{
+//	//On input button pressed 
+//	//Drop the item based on current subIndex
+//	// OPTION 1
+//	/*GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+//	SetItemState(EItemsState::EIS_Falling);
+//
+//	FRotator MeshRotation{ 0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f };
+//	GetItemMesh()->SetWorldRotation(MeshRotation, false, nullptr, ETeleportType::TeleportPhysics);
+//	const FVector Forwardmesh = GetItemMesh()->GetForwardVector();
+//	const FVector RightMesh = GetItemMesh()->GetRightVector();
+//
+//	//Direction on which throw weapon
+//	FVector ImpulseDirection = RightMesh.RotateAngleAxis(-20.0f, Forwardmesh);
+//
+//	float RandomRotation = FMath::FRandRange(0.0f, 90.0f);
+//	ImpulseDirection = ImpulseDirection.RotateAngleAxis(RandomRotation, FVector(0.f, 0.f, 1.f));
+//
+//	ImpulseDirection *= ImpulseThrow;
+//
+//	GetItemMesh()->AddImpulse(ImpulseDirection);
+//
+//	if (HasAuthority())
+//	{
+//		GetWorldTimerManager().SetTimer(ThrowItemHandle, this, &APickUpBaseActor::StopFalling, ThrowItemTime);
+//	}
+//	*/
+//
+//
+//	//OPTION2
+//	//GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+//	SetItemState(EItemsState::EIS_Falling);
+//
+//	if (APMBaseCharacter* ActorOwner = Cast<APMBaseCharacter>(this->GetAttachParentActor()))
+//	{
+//		const FVector Location = GetActorLocation();
+//		const FVector Forward = ActorOwner->GetActorForwardVector();
+//
+//		const float DropItemDistance = ImpulseThrow;
+//		const float DropItemTraceDistance = 10.0f;
+//
+//		const FVector TraceStart = Location + Forward * DropItemDistance;
+//		const FVector TraceEnd = TraceStart - FVector::UpVector * DropItemTraceDistance;
+//
+//		TArray<AActor*> ActorsToIgnore = { this->GetAttachParentActor() };
+//		FHitResult HitResult;
+//		FVector TargetLocation = TraceEnd;
+//
+//		if (UKismetSystemLibrary::LineTraceSingleByProfile(this, TraceStart, TraceEnd, TEXT("WorldStatic"), true, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
+//		{
+//			if (HitResult.bBlockingHit)
+//			{
+//				TargetLocation = HitResult.Location;
+//				GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+//				this->SetActorLocation(HitResult.Location);
+//			}
+//			else
+//			{
+//				GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+//				this->SetActorLocation(TraceEnd);
+//			}
+//		};
+//
+//		GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+//		this->SetActorLocation(TraceEnd);
+//		if (HasAuthority())
+//		{
+//			GetWorldTimerManager().SetTimer(ThrowItemHandle, this, &APickUpBaseActor::StopFalling, ThrowItemTime);
+//		}
+//	}
+//}
 
-void APickUpBaseActor::StartDropItem()
-{
-	//On input button pressed 
-	//Drop the item based on current subIndex
-	// OPTION 1
-	/*GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	SetItemState(EItemsState::EIS_Falling);
-
-	FRotator MeshRotation{ 0.f, GetItemMesh()->GetComponentRotation().Yaw, 0.f };
-	GetItemMesh()->SetWorldRotation(MeshRotation, false, nullptr, ETeleportType::TeleportPhysics);
-	const FVector Forwardmesh = GetItemMesh()->GetForwardVector();
-	const FVector RightMesh = GetItemMesh()->GetRightVector();
-
-	//Direction on which throw weapon
-	FVector ImpulseDirection = RightMesh.RotateAngleAxis(-20.0f, Forwardmesh);
-
-	float RandomRotation = FMath::FRandRange(0.0f, 90.0f);
-	ImpulseDirection = ImpulseDirection.RotateAngleAxis(RandomRotation, FVector(0.f, 0.f, 1.f));
-
-	ImpulseDirection *= ImpulseThrow;
-
-	GetItemMesh()->AddImpulse(ImpulseDirection);
-
-	if (HasAuthority())
-	{
-		GetWorldTimerManager().SetTimer(ThrowItemHandle, this, &APickUpBaseActor::StopFalling, ThrowItemTime);
-	}
-	*/
-
-
-	//OPTION2
-	//GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	SetItemState(EItemsState::EIS_Falling);
-
-	if (APMBaseCharacter* ActorOwner = Cast<APMBaseCharacter>(this->GetAttachParentActor()))
-	{
-		const FVector Location = GetActorLocation();
-		const FVector Forward = ActorOwner->GetActorForwardVector();
-
-		const float DropItemDistance = ImpulseThrow;
-		const float DropItemTraceDistance = 10.0f;
-
-		const FVector TraceStart = Location + Forward * DropItemDistance;
-		const FVector TraceEnd = TraceStart - FVector::UpVector * DropItemTraceDistance;
-
-		TArray<AActor*> ActorsToIgnore = { this->GetAttachParentActor() };
-		FHitResult HitResult;
-		FVector TargetLocation = TraceEnd;
-
-		if (UKismetSystemLibrary::LineTraceSingleByProfile(this, TraceStart, TraceEnd, TEXT("WorldStatic"), true, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true))
-		{
-			if (HitResult.bBlockingHit)
-			{
-				TargetLocation = HitResult.Location;
-				GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-				this->SetActorLocation(HitResult.Location);
-			}
-			else
-			{
-				GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-				this->SetActorLocation(TraceEnd);
-			}
-		};
-
-		GetRootComponent()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		this->SetActorLocation(TraceEnd);
-		if (HasAuthority())
-		{
-			GetWorldTimerManager().SetTimer(ThrowItemHandle, this, &APickUpBaseActor::StopFalling, ThrowItemTime);
-		}
-	}
-}
-
-void APickUpBaseActor::Server_DropItem_Implementation()
-{
-	StartDropItem();
-}
+//void APickUpBaseActor::Server_DropItem_Implementation()
+//{
+//	StartDropItem();
+//}
 
 
-void APickUpBaseActor::StopFalling()
-{
-	SetItemState(EItemsState::EIS_Pickup);
+//void APickUpBaseActor::StopFalling()
+//{
+//	SetItemState(EItemsState::EIS_Pickup);
+//
+//}
 
-}
-
-void APickUpBaseActor::Server_StopFalling_Implementation()
-{
-	StopFalling();
-}
+//void APickUpBaseActor::Server_StopFalling_Implementation()
+//{
+//	StopFalling();
+//}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////

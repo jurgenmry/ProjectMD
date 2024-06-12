@@ -42,16 +42,16 @@ private:
 	TObjectPtr <UInputAction> LookAction;
 
 	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr <UInputAction> InteractAction;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	//TObjectPtr <UInputAction> InteractAction;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr <UInputAction> DropItemAction;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	//TObjectPtr <UInputAction> DropItemAction;
 
 
-	/*Swap items in inventory */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	//Swap items in inventory 
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr <UInputAction> OneKeyPressedAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -62,7 +62,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr <UInputAction> FourKeyPressedAction;
-
+	*/
 
 	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -88,17 +88,19 @@ protected:
 	/*Jump*/
 	void Jump();
 
-	/*Interact*/
-	void InteractWithObject();
 
-	void DropEquippedItem();
 
-	/* Select Item */
+	//Interact
+	//void InteractWithObject();
 
-	void OneKeyPressed();
-	void TwoKeyPressed();
-	void ThreeKeyPressed();
-	void FourKeyPressed();
+	//void DropEquippedItem();
+
+	// Select Item 
+
+	//void OneKeyPressed();
+	//void TwoKeyPressed();
+	//void ThreeKeyPressed();
+	//void FourKeyPressed();
 
 
 	/*

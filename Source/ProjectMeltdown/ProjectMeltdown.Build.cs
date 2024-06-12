@@ -8,7 +8,7 @@ public class ProjectMeltdown : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities", "GameplayTags", "GameplayTasks","UMG", "Slate", "SlateCore", "NetCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "GameplayAbilities", "GameplayTags", "GameplayTasks","UMG", "Slate", "SlateCore", "NetCore", "Niagara" });
         PrivateDependencyModuleNames.AddRange(new string[] {  });
     }
 }

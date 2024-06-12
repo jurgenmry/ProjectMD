@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Components")
 	class UStaticMeshComponent* StoreMesh;
 
-	virtual void Interact(APMCharacter* InInteractOwner) override; 
+//	virtual void Interact(APMCharacter* InInteractOwner) override; 
 
 	//virtual void Interact_Implementation(AActor* InInteractOwner) override;
 	

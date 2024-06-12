@@ -23,12 +23,12 @@ AStoreBaseActor::AStoreBaseActor()
 }
 
 
-
+/*
 void AStoreBaseActor::Interact(APMCharacter* InInteractOwner)
 {
 	//Do Something
 }
-
+*/
 
 /*
 void AStoreBaseActor::Interact_Implementation(AActor* InInteractOwner)

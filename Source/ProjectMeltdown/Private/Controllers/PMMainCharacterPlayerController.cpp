@@ -49,17 +49,19 @@ void APMMainCharacterPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APMMainCharacterPlayerController::Look);
 
 		// Interacting
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::InteractWithObject);
+		//EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::InteractWithObject);
 
 		//DropItem
-		EnhancedInputComponent->BindAction(DropItemAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::DropEquippedItem);
+		//EnhancedInputComponent->BindAction(DropItemAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::DropEquippedItem);
 
 		/* Accesing the character's inventory */
 
+		/*
 		EnhancedInputComponent->BindAction(OneKeyPressedAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::OneKeyPressed);
 		EnhancedInputComponent->BindAction(TwoKeyPressedAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::TwoKeyPressed);
 		EnhancedInputComponent->BindAction(ThreeKeyPressedAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::ThreeKeyPressed);
 		EnhancedInputComponent->BindAction(FourKeyPressedAction, ETriggerEvent::Started, this, &APMMainCharacterPlayerController::FourKeyPressed);
+		*/
 
 		/*
 		//EquipItem
@@ -118,6 +120,7 @@ void APMMainCharacterPlayerController::Jump()
 	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Cyan, FString::Printf(TEXT("Pressing Interaction")));
 }
 
+/*
 void APMMainCharacterPlayerController::InteractWithObject()
 {
 	APMCharacter* ControlledCharacter = Cast<APMCharacter>(GetCharacter());//GetPawn<APMCharacter>();
@@ -166,7 +169,7 @@ void APMMainCharacterPlayerController::FourKeyPressed()
 		return;
 	ControlledCharacter->FourKeyPressedCharacter();
 }
-
+*/
 
 
 

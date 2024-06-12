@@ -4,26 +4,73 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
-#include "Interfaces/InteractInterface.h"
+#include "GameplayTagContainer.h"
+#include "Abilities/GameplayAbilityTypes.h"
+#include "Inventory/ItemStaticData.h"
+//#include "Interfaces/InteractInterface.h"
 #include "InteractableActorBase.generated.h"
 
 
-/*
-UENUM()
-enum class EItemState : uint8
+class UInventoryItemInstance;
+class USphereComponent;
+
+
+UCLASS()
+class PROJECTMELTDOWN_API AInteractableActorBase : public AActor
 {
-	Ready_For_Pickup UMETA(DisplayName = "Ready_For_Pickup"),
-	Equip_Interping UMETA(DisplayName = "Equip_Interping"),
-	Item_PickedUp UMETA(DisplayName = "Item_PickedUp"),
-	Equipped UMETA(DisplayName = "Equipped"),
-	NoState UMETA(DisplayName = "No_State") // This is for doors and others
+	GENERATED_BODY()
 
-	//Should add drop item as well 
+public:
+	// Sets default values for this actor's properties
+	AInteractableActorBase();
+
+	virtual void OnEquipped();
+	virtual void OnUnequipped();
+	virtual void OnDropped();
+
+	virtual bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+
+	void Init(UInventoryItemInstance* InInstance);
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	UPROPERTY(ReplicatedUsing = OnRep_ItemInstance)
+	UInventoryItemInstance* ItemInstance = nullptr;
+
+	UFUNCTION()
+	void OnRep_ItemInstance(UInventoryItemInstance* OldItemInstance);
+
+	UPROPERTY(ReplicatedUsing = OnRep_ItemState)
+	EItemState ItemState = EItemState::None;
+
+	UFUNCTION()
+	void OnRep_ItemState();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USphereComponent* SphereComponent = nullptr;
+
+	UFUNCTION()
+	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UItemStaticData> ItemStaticDataClass;
+
+	UPROPERTY(EditAnywhere, Replicated)
+	int32 Quantity = 1;
+
+	virtual void InitInternal();
+
+public:
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 };
-*/
 
 
+//old Implementation
+/*
 UCLASS()
 class PROJECTMELTDOWN_API AInteractableActorBase : public AActor, public IInteractInterface
 {
@@ -57,7 +104,7 @@ public:
 
 	FORCEINLINE UStaticMeshComponent* GetItemMesh() const { return PickUpMesh; }
 
-	/* Interact interface overrides */
+	//Interact interface overrides 
 
 	virtual void BeginFocus() override;
 
@@ -68,7 +115,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	/*For Inventory*/
+	///For Inventory
 	virtual void PickUpItem() override {};
 	virtual void SwapItem() override{};
 	virtual void EquipItem(class APMCharacter* InPickupOwner) override {};
@@ -96,3 +143,4 @@ protected:
 	
 
 };
+*/

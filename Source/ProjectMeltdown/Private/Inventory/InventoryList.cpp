@@ -37,3 +37,56 @@ void FInventoryList::RemoveItem(TSubclassOf<class UItemStaticData> inItemDataCla
 		}
 	}
 }
+
+void FInventoryList::RemoveItemInstance(UInventoryItemInstance* InItemInstance)
+{
+	for (auto ItemIter = Items.CreateIterator(); ItemIter; ++ItemIter)
+	{
+		FInventoryListItem& Item = *ItemIter;
+		if (Item.ItemInstance && Item.ItemInstance == InItemInstance)
+		{
+			ItemIter.RemoveCurrent();
+			MarkArrayDirty();
+			break;
+		}
+	}
+}
+
+TArray<UInventoryItemInstance*> FInventoryList::GetAllInstancesWithTag(FGameplayTag InTag)
+{
+	TArray<UInventoryItemInstance*> OutInstances;
+
+	for (auto ItemIter = Items.CreateIterator(); ItemIter; ++ItemIter)
+	{
+		FInventoryListItem& Item = *ItemIter;
+
+		if (Item.ItemInstance->GetItemStaticData()->InventoryTags.Contains(InTag))
+		{
+			OutInstances.Add(Item.ItemInstance);
+		}
+	}
+
+	return OutInstances;
+}
+
+TArray<UInventoryItemInstance*> FInventoryList::GetAllAvailableInstancesOfType(TSubclassOf<UItemStaticData> InItemStaticDataClass)
+{
+	TArray<UInventoryItemInstance*> OutInstances;
+
+	for (auto ItemIter = Items.CreateIterator(); ItemIter; ++ItemIter)
+	{
+		FInventoryListItem& Item = *ItemIter;
+
+		const UItemStaticData* StaticData = Item.ItemInstance->GetItemStaticData();
+
+		const bool bSameType = StaticData->IsA(InItemStaticDataClass);
+		const bool bHasCapacity = StaticData->MaxStackCount > Item.ItemInstance->GetQuantity();
+
+		if (bSameType && bHasCapacity)
+		{
+			OutInstances.Add(Item.ItemInstance);
+		}
+	}
+
+	return OutInstances;
+}

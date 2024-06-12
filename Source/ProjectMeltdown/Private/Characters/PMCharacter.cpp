@@ -24,13 +24,20 @@
 #include "WorldActors/InteractableActorBase.h"
 #include "WorldActors/PickUpBaseActor.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 
-/*Inventory*/
+// Input component
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputTriggers.h"
+#include "InputActionValue.h"
+
+//Inventory
 
 #include "Inventory/InventoryComponent.h"
 
 APMCharacter::APMCharacter()
-	: EquippedItem(nullptr)
+	//: EquippedItem(nullptr)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -50,11 +57,9 @@ APMCharacter::APMCharacter()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	InventoryComponent->SetIsReplicated(true);
 
-	/* Old Inventory Stuff*/
-	//can be added on player state to avoid loosing items
-	//CharacterInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("CharacterInventory"));
-	//CharacterInventory->SetIsReplicated(true);
 }
 
 void APMCharacter::BeginPlay()
@@ -75,7 +80,7 @@ void APMCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	TraceForItems();
+	//TraceForItems();
 }
 
 void APMCharacter::PossessedBy(AController* NewController)
@@ -91,8 +96,8 @@ void APMCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	
 	//DOREPLIFETIME(APMCharacter, CharacterInventory);
 
-	DOREPLIFETIME(APMCharacter, EquippedItem);
-	DOREPLIFETIME_CONDITION(APMCharacter, Inventory, COND_OwnerOnly);
+	//DOREPLIFETIME(APMCharacter, EquippedItem);
+	DOREPLIFETIME(APMCharacter, InventoryComponent);//, COND_OwnerOnly);
 }
 
 int32 APMCharacter::GetPlayerlevel()
@@ -190,6 +195,90 @@ void APMCharacter::InitAbilityActorInfo()
 }
 
 
+// Inventory
+UInventoryComponent* APMCharacter::GetInventoryComponent() const
+{
+	return InventoryComponent;
+}
+
+
+// Input
+
+void APMCharacter::OnDropItemTriggered(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = UInventoryComponent::DropItemTag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::DropItemTag, EventPayload);
+}
+
+void APMCharacter::OnEquipNextTriggered(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = UInventoryComponent::EquipNextTag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipNextTag, EventPayload);
+}
+
+void APMCharacter::OnUnequipTriggered(const FInputActionValue& Value)
+{
+
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = UInventoryComponent::UnequipTag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::UnequipTag, EventPayload);
+}
+
+void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	if (PlayerInputComponent)
+	{
+		if (UEnhancedInputComponent* PlayerEnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+		{
+			if (EquipNextInputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(EquipNextInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipNextTriggered);
+			}
+
+			if (DropItemInputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(DropItemInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnDropItemTriggered);
+			}
+
+			if (UnequipInputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(UnequipInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnUnequipTriggered);
+			}
+		}
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                MOST OF THIS CODE WAS WORKING. COMMENTD TO IMPLEMENT NEW INVENTORY
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 
 /////////////////////////////////////////////////////////////////////
 //
@@ -197,7 +286,7 @@ void APMCharacter::InitAbilityActorInfo()
 //
 ////////////////////////////////////////////////////////////////////
 
-
+/*
 void APMCharacter::TraceForItems()
 {
 	if (CanOverlap)
@@ -223,40 +312,6 @@ void APMCharacter::TraceForItems()
 					return;
 				}
 			}
-
-			// Working
-			/*
-			if (ItemTraceresult.GetActor() != CurrentIntertactable)
-			{
-				IInteractInterface* interactableInterface = nullptr;
-
-				interactableInterface = Cast<IInteractInterface>(ItemTraceresult.GetActor());
-				//CurrentIntertactable = interactableInterface ? ItemTraceresult.GetActor() : nullptr;
-
-				if (interactableInterface != nullptr)
-				{
-					CurrentIntertactable = ItemTraceresult.GetActor();
-					return;
-				}
-				else
-				{
-					CurrentIntertactable = nullptr;
-				}
-
-			}
-			*/
-
-			/*
-			if (ItemTraceresult.GetActor()->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
-			{
-				//CurrentIntertactable = Cast<APickUpBaseActor>(ItemTraceresult.GetActor());
-				if (ItemTraceresult.GetActor() != CurrentIntertactable)
-				{
-					CurrentIntertactable = ItemTraceresult.GetActor();
-					return;
-				}
-			}
-			*/
 		}	
 	}
 
@@ -265,7 +320,9 @@ void APMCharacter::TraceForItems()
 		NoInteractableFound();
 	}
 }
+*/
 
+/*
 bool APMCharacter::PerformTrace(FHitResult& OutHitResult, FVector& OutHitLocation)
 {
 	FVector2D VierportSize;
@@ -289,13 +346,13 @@ bool APMCharacter::PerformTrace(FHitResult& OutHitResult, FVector& OutHitLocatio
 		OutHitLocation = End;
 
 		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECollisionChannel::ECC_Visibility);
-		/*DrawDebugLine(
+		DrawDebugLine(
 			GetWorld(),
 			Start,
 			End,
 			FColor::Red,
 			false, -1, 0,
-			1.0f);*/
+			1.0f);
 		if (OutHitResult.bBlockingHit)
 		{
 			OutHitLocation = OutHitResult.Location;
@@ -303,8 +360,9 @@ bool APMCharacter::PerformTrace(FHitResult& OutHitResult, FVector& OutHitLocatio
 		}
 	}
 	return false;
-}
+}*/
 
+/*
 void APMCharacter::FoundInteractable(AActor* NewInteractable)
 {
 	if (IsValid(TargetInteractable.GetObject()))
@@ -321,8 +379,9 @@ void APMCharacter::FoundInteractable(AActor* NewInteractable)
 	CurrentIntertactable = NewInteractable;
 	TargetInteractable = NewInteractable;
 	TargetInteractable->BeginFocus();
-}
+}*/
 
+/*
 void APMCharacter::NoInteractableFound()
 {
 	if (CurrentIntertactable)
@@ -336,8 +395,9 @@ void APMCharacter::NoInteractableFound()
 		TargetInteractable = nullptr;
 	}
 }
+*/
 
-
+/*
 void APMCharacter::Interact()
 {
 	if (IsValid(TargetInteractable.GetObject()))
@@ -352,8 +412,9 @@ void APMCharacter::Interact()
 			Server_Interact(TargetInteractable->_getUObject());
 		}
 	}
-}
+}*/
 
+/*
 void APMCharacter::Server_Interact_Implementation(UObject* InterfaceContext)//IInteractInterface* Interface)
 {
 	if (IInteractInterface* interactInterface = Cast<IInteractInterface>(InterfaceContext))
@@ -362,6 +423,7 @@ void APMCharacter::Server_Interact_Implementation(UObject* InterfaceContext)//II
 		NoInteractableFound();
 	}
 }
+*/
 
 
 
@@ -374,8 +436,8 @@ void APMCharacter::Server_Interact_Implementation(UObject* InterfaceContext)//II
 
 //New Testing code: Working Huyeeaahhh !
 
-/* Equip An Item */
-
+//Equip An Item 
+/*
 void APMCharacter::EquipItem()
 {
 
@@ -395,77 +457,17 @@ void APMCharacter::EquipItem()
 		}
 	}
 
-
-
-	//v2 . working only onserver. 
-	/* (IsValid(TargetInteractable.GetObject()))
-	{
-		APickUpBaseActor* ItemToEquip = Cast<APickUpBaseActor>(TargetInteractable.GetObject());
-		if (ItemToEquip)
-		{
-			if (HasAuthority())
-			{
-				if (EquippedItem != ItemToEquip)
-				{
-					if (Inventory.Num() < INVENTORY_CAPACITY)
-					{
-						if (EquippedItem)
-						{
-							Inventory.Add(EquippedItem);
-							EquippedItem->SetItemState(EItemsState::EIS_PickedUP);
-						}
-						ItemToEquip->EquipItem(this);
-					}
-					else // Inventory is full
-					{
-						SwapItem(ItemToEquip);
-					}
-
-				}
-				else
-				{
-					ItemToEquip->EquipItem(this);
-				}
-
-				// Add debug message to show the number of items in the inventory
-				FString DebugMessage = FString::Printf(TEXT("Inventory Count: %d"), Inventory.Num());
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, DebugMessage);
-			}
-			else
-			{
-				Server_EquipItem(this, TargetInteractable.GetObject());
-			}
-		}
-	}*/
-
-
-	//Working with single object
-	/*if (IsValid(TargetInteractable.GetObject()))
-	{
-		if (HasAuthority())
-		{
-			if (EquippedItem != Cast<APickUpBaseActor>(TargetInteractable.GetObject()))
-			{
-				SwapItem(Cast<APickUpBaseActor>(TargetInteractable.GetObject()));
-			}
-			else 
-			{
-				TargetInteractable->EquipItem(this);
-			}
-		}
-		else
-		{
-			Server_EquipItem(this, TargetInteractable.GetObject());
-		}
-	}
-	*/
 }
+*/
 
+/*
 bool APMCharacter::Server_EquipItem_Validate(APMCharacter* InCharacterOwner, UObject* InterfaceContext) 
 {
 	return true;
 }
+*/
  
+/*
 void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwner, UObject* InterfaceContext) 
 {
 	
@@ -497,31 +499,11 @@ void APMCharacter::Server_EquipItem_Implementation(APMCharacter* InCharacterOwne
 			}
 		}
 	}
-	
-	//v2 Working only on server
-	/*if (IInteractInterface* InteractInterface = Cast<IInteractInterface>(InterfaceContext))
-	{
-		InteractInterface->EquipItem(InCharacterOwner);
-	}*/
-	
-	//Working single Item
-	/* 
-	if (IInteractInterface* InteractInterface = Cast<IInteractInterface>(InterfaceContext))
-	{
-		if (EquippedItem != Cast<APickUpBaseActor>(InterfaceContext))
-		{
-			Server_SwapItem(InCharacterOwner, Cast<APickUpBaseActor>(InterfaceContext));
-		}
-		else
-		{
-			InteractInterface->EquipItem(InCharacterOwner);
-		}
-	}
-	*/
 }
+*/
 
-/* Dropping An Item */
-
+//Dropping An Item
+/*
 void APMCharacter::DropItem()
 {
 	if (EquippedItem)
@@ -537,7 +519,9 @@ void APMCharacter::DropItem()
 		}
 	}	
 }
+*/
 
+/*
 void APMCharacter::Server_DropItem_Implementation(APMCharacter* InCharacterOwner)
 {
 	
@@ -546,21 +530,12 @@ void APMCharacter::Server_DropItem_Implementation(APMCharacter* InCharacterOwner
 		EquippedItem->DropItem(this);
 		EquippedItem = nullptr;
 	}
-	
-
-	//Version 2 working only on server
-	/*
-	if (EquippedItem)
-	{
-		EquippedItem->DropItem(InCharacterOwner);
-		SetEquippedItem(nullptr);
-	}
-	*/
 }
+*/
 
 
-/* Swapping An Item */
-
+// Swapping An Item 
+/*
 void APMCharacter::SwapItem(APickUpBaseActor* ItemToSwap)
 {
 
@@ -572,31 +547,9 @@ void APMCharacter::SwapItem(APickUpBaseActor* ItemToSwap)
 	{
 		Server_SwapItem(ItemToSwap);
 	}
+}*/
 
-
-	//Working only on the server
-	/*
-	if (EquippedItem)
-	{
-		EquippedItem->DropItem(this);
-	}
-	ItemToSwap->EquipItem(this);
-	*/
-
-	//Working single item
-	/*
-	if (HasAuthority())
-	{
-		DropItem();
-		ItemToSwap->EquipItem(this);
-	}
-	else
-	{
-		Server_SwapItem(this, ItemToSwap);
-	}
-	*/
-}
-
+/*
 void APMCharacter::Server_SwapItem_Implementation(APickUpBaseActor* ItemToSwap)//v1 APMCharacter* InCharacterOwner, APickUpBaseActor* ItemToSwap)
 {
 
@@ -606,25 +559,11 @@ void APMCharacter::Server_SwapItem_Implementation(APickUpBaseActor* ItemToSwap)/
 	}
 	EquippedItem = ItemToSwap;
 	ItemToSwap->EquipItem(this);
-	
-	
-	//Working only on server
-	/*Server_DropItem(InCharacterOwner);
-	Server_EquipItem(InCharacterOwner, ItemToSwap);*/
-	
-	//Working single item
-	/*
-	if (ItemToSwap)
-	{
-		DropItem();
-		ItemToSwap->EquipItem(InCharacterOwner);
-	}
-	*/
-}
+}*/
 
 
-/* Exchange Inventory Based on Key press */
-
+// Exchange Inventory Based on Key press 
+/*
 void APMCharacter::ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemIndex)
 {
 
@@ -657,35 +596,38 @@ void APMCharacter::ExchangeInventoryItems(int32 CurrentItemIndex, int32 NewItemI
 	}
 
 	//Sort of working.
-	/*
-	if ((CurrentItemIndex == NewItemIndex) || NewItemIndex >= Inventory.Num()) return;
+	//
+	//if ((CurrentItemIndex == NewItemIndex) || NewItemIndex >= Inventory.Num()) return;
+	//
+	//	auto OldEquippedItem = EquippedItem;
+	//auto NewItem = Cast<APickUpBaseActor>(Inventory[NewItemIndex]);
+	//
+	//if (OldEquippedItem)
+	//{
+	//	OldEquippedItem->SetItemState(EItemsState::EIS_PickedUP);
+	//	Inventory[CurrentItemIndex] = OldEquippedItem;
+	//}
+	//
+	//NewItem->SetItemState(EItemsState::EIS_Equipped);
+	//EquippedItem = NewItem;
+	//
+	//Inventory[NewItemIndex] = nullptr; // Optional, to remove the reference
+	//if (!HasAuthority())
+	//{
+	//	Server_ExchangeInventoryItems(CurrentItemIndex, NewItemIndex);
+	//}
+	//
+//}
+*/
 
-	auto OldEquippedItem = EquippedItem;
-	auto NewItem = Cast<APickUpBaseActor>(Inventory[NewItemIndex]);
-
-	if (OldEquippedItem)
-	{
-		OldEquippedItem->SetItemState(EItemsState::EIS_PickedUP);
-		Inventory[CurrentItemIndex] = OldEquippedItem;
-	}
-
-	NewItem->SetItemState(EItemsState::EIS_Equipped);
-	EquippedItem = NewItem;
-
-	Inventory[NewItemIndex] = nullptr; // Optional, to remove the reference
-	if (!HasAuthority())
-	{
-		Server_ExchangeInventoryItems(CurrentItemIndex, NewItemIndex);
-	}
-	*/
-}
-
+/*
 void APMCharacter::Server_ExchangeInventoryItems_Implementation(int32 CurrentItemIndex, int32 NewItemIndex)
 {
 	ExchangeInventoryItems(CurrentItemIndex, NewItemIndex);
 }
+*/
 
-void APMCharacter::OneKeyPressedCharacter()
+/*void APMCharacter::OneKeyPressedCharacter()
 {
 	if (EquippedItem && EquippedItem->GetSlotIndex() == 0) return;
 	if (Inventory.IsValidIndex(0) && Inventory[0])
@@ -719,7 +661,7 @@ void APMCharacter::FourKeyPressedCharacter()
 	{
 		ExchangeInventoryItems(EquippedItem ? EquippedItem->GetSlotIndex() : -1, 3);
 	}
-}
+}*/
 
 
 
