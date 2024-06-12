@@ -20,7 +20,9 @@ public:
 	
 	UInventoryComponent();
 
-	virtual void InitializeComponent() override;
+	void InitCustomeComponent(class UPMBaseAbilitySystemComponent* ASC);
+
+	//virtual void InitializeComponent() override;
 
 	virtual bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 

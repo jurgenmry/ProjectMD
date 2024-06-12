@@ -145,6 +145,9 @@ void APMCharacter::InitAbilityActorInfo()
 		APMMainCharacterPlayerController* PC = Cast<APMMainCharacterPlayerController>(GetController());
 		if (PC)
 		{
+			
+
+
 			//We need to cast the result to our own hud
 			APMBaseHud* BaseHud = Cast<APMBaseHud>(PC->GetHUD());
 			if (BaseHud)
@@ -152,12 +155,12 @@ void APMCharacter::InitAbilityActorInfo()
 				BaseHud->InitOverlay(PC, MainPlayerState, AbilitySystemComponent, AttributeSet);
 			}
 
-			/*
-			if (CharacterInventory)
+
+			if (InventoryComponent)
 			{
-				CharacterInventory->InitializeInventoryComponent(PC,MainPlayerState, AbilitySystemComponent);
+				InventoryComponent->InitCustomeComponent(AbilitySystemComponent);
 			}
-			*/
+
 		}
 
 		/* Custome code based on Trenak (Needs Review for implementation)

@@ -18,6 +18,7 @@
 #include "GameModes/PMPlayerState.h"
 #include "Controllers/PMMainCharacterPlayerController.h"
 #include "Characters/PMCharacter.h"
+#include "AbilitySystem/PMBaseAbilitySystemComponent.h"
 
 #include "Inventory/FastArrayTagCounter.h"
 
@@ -51,13 +52,12 @@ UInventoryComponent::UInventoryComponent()
 
 int32 UInventoryComponent::GetInventoryTagCount(FGameplayTag Tag) const
 {
-	return 0;
-	//return InventoryTags.GetTagCount(Tag);
+	return InventoryTags.GetTagCount(Tag);
 }
 
 void UInventoryComponent::AddInventoryTagCount(FGameplayTag InTag, int32 CountDelta)
 {
-	//InventoryTags.AddTagCount(InTag, CountDelta);
+	InventoryTags.AddTagCount(InTag, CountDelta);
 }
 
 void UInventoryComponent::AddInventoryTags()
@@ -72,6 +72,26 @@ void UInventoryComponent::AddInventoryTags()
 	TagsManager.OnLastChanceToAddNativeTags().RemoveAll(this);
 }
 
+void UInventoryComponent::InitCustomeComponent(class UPMBaseAbilitySystemComponent* ASC)
+{
+	if (GetOwner()->HasAuthority())
+	{
+		for (auto ItemClass : DefaultItems)
+		{
+			InventoryList.AddItem(ItemClass);
+		}
+	}
+
+	if (ASC)//UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner()))
+	{
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipItemActorTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::DropItemTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipNextTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::UnequipTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+	}
+}
+
+/*
 void UInventoryComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
@@ -84,15 +104,18 @@ void UInventoryComponent::InitializeComponent()
 		}
 	}
 
-	if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner()))
+	APMCharacter* CharacterOwner = Cast<APMCharacter>(this->GetOwner());
+	APMPlayerState* PS = Cast<APMPlayerState>(CharacterOwner->GetPlayerState());
+	UPMBaseAbilitySystemComponent* ASC = Cast<UPMBaseAbilitySystemComponent>(PS->GetAbilitySystemComponent());
+
+	if (ASC)//UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner()))
 	{
 		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipItemActorTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
 		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::DropItemTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
 		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipNextTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
 		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::UnequipTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
-
 	}
-}
+}*/
 
 void UInventoryComponent::AddItem(TSubclassOf<UItemStaticData> InItemStaticDataClass)
 {
