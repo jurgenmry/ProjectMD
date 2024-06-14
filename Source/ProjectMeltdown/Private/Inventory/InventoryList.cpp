@@ -8,8 +8,18 @@
 #include "Inventory/InventoryItemInstance.h"
 
 
+FInventoryList::FInventoryList() // CD
+{
+	Items.Reserve(MaxInventorySize);
+}
+
 void FInventoryList::AddItem(TSubclassOf<UItemStaticData> inItemDataClass)
 {
+	if (Items.Num() >= MaxInventorySize) // CD
+	{                                   
+		Items.RemoveAt(0);               // CD
+	}
+
 	FInventoryListItem& Item = Items.AddDefaulted_GetRef();
 	Item.ItemInstance = NewObject<UInventoryItemInstance>();
 	Item.ItemInstance->Init(inItemDataClass);
@@ -19,6 +29,11 @@ void FInventoryList::AddItem(TSubclassOf<UItemStaticData> inItemDataClass)
 
 void FInventoryList::AddItemInstance(UInventoryItemInstance* InItemInstance)
 {
+	if (Items.Num() >= MaxInventorySize)  // CD
+	{
+		Items.RemoveAt(0);                // CD
+	}
+
 	FInventoryListItem& Item = Items.AddDefaulted_GetRef();
 	Item.ItemInstance = InItemInstance;
 	MarkItemDirty(Item);
@@ -50,6 +65,33 @@ void FInventoryList::RemoveItemInstance(UInventoryItemInstance* InItemInstance)
 			break;
 		}
 	}
+}
+
+bool FInventoryList::AddItem(const FInventoryListItem& Item) // CD
+{
+	if (Items.Num() >= MaxInventorySize)
+	{
+		Items.RemoveAt(0);
+	}
+	Items.Add(Item);
+	return true;
+}
+
+void FInventoryList::RemoveItem(int32 Index) // CD
+{
+	if (Index >= 0 && Index < Items.Num())
+	{
+		Items.RemoveAt(Index);
+	}
+}
+
+FInventoryListItem* FInventoryList::GetItem(int32 Index) // CD
+{
+	if (Index >= 0 && Index < Items.Num())
+	{
+		return &Items[Index];
+	}
+	return nullptr;
 }
 
 TArray<UInventoryItemInstance*> FInventoryList::GetAllInstancesWithTag(FGameplayTag InTag)
@@ -89,4 +131,12 @@ TArray<UInventoryItemInstance*> FInventoryList::GetAllAvailableInstancesOfType(T
 	}
 
 	return OutInstances;
+}
+
+void FInventoryList::EnforceSizeLimit()
+{
+	while (Items.Num() > MaxInventorySize)
+	{
+		Items.RemoveAt(0);
+	}
 }

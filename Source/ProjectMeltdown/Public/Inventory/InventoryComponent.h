@@ -65,6 +65,19 @@ public:
 	static FGameplayTag DropItemTag;
 	static FGameplayTag EquipNextTag;
 	static FGameplayTag UnequipTag;
+	static FGameplayTag CanTraceItemActorTag; //CD
+	static FGameplayTag RemoveCanTraceItemActorTag;//CD
+
+	static  FGameplayTag EquipItem1Tag; //CD
+	static  FGameplayTag EquipItem2Tag; //CD
+	static  FGameplayTag EquipItem3Tag; //CD
+	static  FGameplayTag EquipItem4Tag; //CD
+
+	UFUNCTION(BlueprintCallable)
+	void EquipItemAtIndex(int32 Index); //CD
+
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory", Replicated)
+	bool bCanTraceItemActorTag; //CD
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetInventoryTagCount(FGameplayTag Tag) const;
@@ -72,19 +85,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddInventoryTagCount(FGameplayTag InTag, int32 CountDelta);
 
+	UPROPERTY(Replicated)
+	FInventoryList InventoryList;
+
 protected:
 
 	UFUNCTION()
 	void AddInventoryTags();
 
-	UPROPERTY(Replicated)
-	FInventoryList InventoryList;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<UItemStaticData>> DefaultItems;
 
 	UPROPERTY(Replicated)
-	UInventoryItemInstance* CurrentItem = nullptr;
+	UInventoryItemInstance* CurrentItem ;
 
 	UPROPERTY(Replicated)
 	FFastArrayTagCounter InventoryTags;
@@ -95,6 +109,11 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerHandleGameplayEvent(FGameplayEventData Payload);
+
+
+	//Tracing for checking item / ui
+	void TraceForItems();
+	bool PerformTrace(FHitResult& OutHitResult, FVector& OutHitLocation);
 
 public:
 	// Called every frame

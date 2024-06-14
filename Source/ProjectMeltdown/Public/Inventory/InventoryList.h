@@ -26,6 +26,8 @@ struct FInventoryList : public FFastArraySerializer
 {
 	GENERATED_BODY()
 
+	FInventoryList(); // CD
+
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams) 
 	{ 
 		return FFastArraySerializer::FastArrayDeltaSerialize<FInventoryListItem, FInventoryList>(Items, DeltaParams,*this);
@@ -37,6 +39,10 @@ struct FInventoryList : public FFastArraySerializer
 	void RemoveItem(TSubclassOf<class UItemStaticData> inItemDataClass);
 	void RemoveItemInstance(UInventoryItemInstance* InItemInstance);
 
+	bool AddItem(const FInventoryListItem& Item); // CD
+	void RemoveItem(int32 Index);                 // CD
+	FInventoryListItem* GetItem(int32 Index);     // CD
+
 public:
 
 	TArray<FInventoryListItem>& GetItemsRef() {return Items;}
@@ -45,11 +51,12 @@ public:
 
 	TArray<UInventoryItemInstance*> GetAllAvailableInstancesOfType(TSubclassOf<UItemStaticData> InItemStaticDataClass);
 
-protected:
-
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	TArray<FInventoryListItem> Items;
 
+	int32 MaxInventorySize = 4; // CD
+	
+	void EnforceSizeLimit();
 };
 
 template<>

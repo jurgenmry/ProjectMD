@@ -232,6 +232,49 @@ void APMCharacter::OnUnequipTriggered(const FInputActionValue& Value)
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::UnequipTag, EventPayload);
 }
 
+
+
+
+void APMCharacter::OnEquipItem(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = UInventoryComponent::EquipItemActorTag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItemActorTag, EventPayload);
+}
+
+void APMCharacter::OnEquipItem1Triggered(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = UInventoryComponent::EquipItem1Tag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem1Tag, EventPayload);
+}
+
+void APMCharacter::OnEquipItem2Triggered(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = UInventoryComponent::EquipItem2Tag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem2Tag, EventPayload);
+}
+
+void APMCharacter::OnEquipItem3Triggered(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = UInventoryComponent::EquipItem3Tag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem3Tag, EventPayload);
+}
+
+void APMCharacter::OnEquipItem4Triggered(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = UInventoryComponent::EquipItem4Tag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem4Tag, EventPayload);
+}
+
 void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -252,6 +295,34 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			if (UnequipInputAction)
 			{
 				PlayerEnhancedInputComponent->BindAction(UnequipInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnUnequipTriggered);
+			}
+
+
+
+
+			if (EquipItem)
+			{
+				PlayerEnhancedInputComponent->BindAction(EquipItem, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem);
+			}
+
+			if (EquipItem1InputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(EquipItem1InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem1Triggered);
+			}
+
+			if (EquipItem2InputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(EquipItem2InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem2Triggered);
+			}
+
+			if (EquipItem3InputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(EquipItem3InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem3Triggered);
+			}
+
+			if (EquipItem4InputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(EquipItem4InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem4Triggered);
 			}
 		}
 	}

@@ -9,6 +9,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemLog.h"
+#include "Blueprint/UserWidget.h"
 
 //Custome includes
 #include "BlueprintLibraries/ProjectMeltdownStatics.h"
@@ -97,6 +98,7 @@ void UInventoryItemInstance::OnDropItem(AActor* InOwner)
 
 	bEquipped = false;
 }
+
 
 AInteractableActorBase* UInventoryItemInstance::GetItemActor() const
 {

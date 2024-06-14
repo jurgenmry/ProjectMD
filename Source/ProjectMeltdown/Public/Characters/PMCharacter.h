@@ -59,6 +59,25 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* UnequipInputAction;
 
+
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* EquipItem; //CD
+
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* EquipItem1InputAction;    //CD
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* EquipItem2InputAction;  //CD
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* EquipItem3InputAction;  //CD
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* EquipItem4InputAction;  //CD
+
+
 	// Input actions: 
 
 	void OnDropItemTriggered(const FInputActionValue& Value);
@@ -67,6 +86,12 @@ public:
 
 	void OnUnequipTriggered(const FInputActionValue& Value);
 
+
+	void OnEquipItem(const FInputActionValue& Value); //CD
+	void OnEquipItem1Triggered(const FInputActionValue& Value); //CD
+	void OnEquipItem2Triggered(const FInputActionValue& Value); //CD
+	void OnEquipItem3Triggered(const FInputActionValue& Value); //CD
+	void OnEquipItem4Triggered(const FInputActionValue& Value); //CD
 
 
 

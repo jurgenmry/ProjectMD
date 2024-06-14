@@ -13,6 +13,7 @@ class UGameplayAbility;
 class UAnimMontage;
 class UNiagaraSystem;
 class AInteractableActorBase;
+class UWidgetComponent;
 
 
 USTRUCT(BlueprintType)
@@ -117,6 +118,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 MaxStackCount = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> ItemWidgetClass;
 };
 
 UCLASS(BlueprintType, Blueprintable)

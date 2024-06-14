@@ -9,7 +9,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayTagsManager.h"
 #include "Abilities/GameplayAbilityTypes.h"
-
+#include "Kismet/GameplayStatics.h"
 
 //Custome includes
 #include "Inventory/InventoryList.h"
@@ -26,6 +26,13 @@ FGameplayTag UInventoryComponent::EquipItemActorTag;
 FGameplayTag UInventoryComponent::DropItemTag;
 FGameplayTag UInventoryComponent::EquipNextTag;
 FGameplayTag UInventoryComponent::UnequipTag;
+FGameplayTag UInventoryComponent::CanTraceItemActorTag;
+FGameplayTag UInventoryComponent::RemoveCanTraceItemActorTag;
+FGameplayTag UInventoryComponent::EquipItem1Tag;
+FGameplayTag UInventoryComponent::EquipItem2Tag;
+FGameplayTag UInventoryComponent::EquipItem3Tag;
+FGameplayTag UInventoryComponent::EquipItem4Tag;
+
 
 static TAutoConsoleVariable<int32> CVarShowInventory(
 	TEXT("ShowDebugInventory"),
@@ -60,6 +67,15 @@ void UInventoryComponent::AddInventoryTagCount(FGameplayTag InTag, int32 CountDe
 	InventoryTags.AddTagCount(InTag, CountDelta);
 }
 
+void UInventoryComponent::EquipItemAtIndex(int32 Index)
+{
+	const FInventoryListItem* Item = InventoryList.GetItem(Index);
+	if (Item)
+	{
+		EquipItemInstance(Item->ItemInstance);
+	}
+}
+
 void UInventoryComponent::AddInventoryTags()
 {
 	UGameplayTagsManager& TagsManager = UGameplayTagsManager::Get();
@@ -68,6 +84,13 @@ void UInventoryComponent::AddInventoryTags()
 	UInventoryComponent::DropItemTag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.DropItem"), TEXT("Drop equipped item"));
 	UInventoryComponent::EquipNextTag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.EquipNext"), TEXT("Try equip next item"));
 	UInventoryComponent::UnequipTag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.Unequip"), TEXT("Unequip current item"));
+	UInventoryComponent::CanTraceItemActorTag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.Trace"), TEXT("Allow Trace for Equipping Items"));
+	UInventoryComponent::RemoveCanTraceItemActorTag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.RemoveCanTraceItemActorTag"), TEXT("Hides widget"));
+	
+	UInventoryComponent::EquipItem1Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.EquipItem1"), TEXT("Add Item on Slot 1"));
+	UInventoryComponent::EquipItem2Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.EquipItem2"), TEXT("Equip item on Slot2"));
+	UInventoryComponent::EquipItem3Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.EquipItem3"));
+	UInventoryComponent::EquipItem4Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.EquipItem4"));
 
 	TagsManager.OnLastChanceToAddNativeTags().RemoveAll(this);
 }
@@ -88,6 +111,13 @@ void UInventoryComponent::InitCustomeComponent(class UPMBaseAbilitySystemCompone
 		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::DropItemTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
 		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipNextTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
 		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::UnequipTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::CanTraceItemActorTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::RemoveCanTraceItemActorTag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipItem1Tag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipItem2Tag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipItem3Tag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
+		ASC->GenericGameplayEventCallbacks.FindOrAdd(UInventoryComponent::EquipItem4Tag).AddUObject(this, &UInventoryComponent::GameplayEventCallback);
 	}
 }
 
@@ -276,6 +306,7 @@ void UInventoryComponent::EquipItem(TSubclassOf<UItemStaticData> InItemStaticDat
 
 				CurrentItem = Item.ItemInstance;
 
+
 				break;
 			}
 		}
@@ -394,6 +425,7 @@ void UInventoryComponent::HandleGameplayEventInternal(FGameplayEventData Payload
 	if (NetRole == ROLE_Authority)
 	{
 		FGameplayTag EventTag = Payload.EventTag;
+		UE_LOG(LogTemp, Log, TEXT("Handling gameplay event: %s"), *EventTag.ToString());
 
 		if (EventTag == UInventoryComponent::EquipItemActorTag)
 		{
@@ -418,6 +450,33 @@ void UInventoryComponent::HandleGameplayEventInternal(FGameplayEventData Payload
 		else if (EventTag == UInventoryComponent::UnequipTag)
 		{
 			UnequipItem();
+		}
+		else if (EventTag == UInventoryComponent::CanTraceItemActorTag) //CD
+		{
+			bCanTraceItemActorTag = true;
+			UE_LOG(LogTemp, Log, TEXT("CanTraceItemActorTag set to true"));
+		}
+
+		else if (EventTag == UInventoryComponent::RemoveCanTraceItemActorTag) //CD
+		{
+			bCanTraceItemActorTag = false;
+			UE_LOG(LogTemp, Log, TEXT("CanTraceItemActorTag set to false"));
+		}
+		else if (EventTag == UInventoryComponent::EquipItem1Tag) //CD
+		{
+			EquipItemAtIndex(0);
+		}
+		else if (EventTag == UInventoryComponent::EquipItem2Tag) //CD
+		{
+			EquipItemAtIndex(1);
+		}
+		else if (EventTag == UInventoryComponent::EquipItem3Tag) //CD
+		{
+			EquipItemAtIndex(2);
+		}
+		else if (EventTag == UInventoryComponent::EquipItem4Tag) //CD
+		{
+			EquipItemAtIndex(3);
 		}
 	}
 }
@@ -474,6 +533,80 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	}
 }
 
+void UInventoryComponent::TraceForItems()
+{
+	FVector HitLocation; //Maybe this need to be adjusted
+	FHitResult ItemTraceresult;
+	PerformTrace(ItemTraceresult, HitLocation);
+
+	if (ItemTraceresult.bBlockingHit)
+	{
+	}	//Test code
+		/*
+		if (ItemTraceresult.GetActor()->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
+		{
+			//If they are not the same we found new Interactable
+			if (ItemTraceresult.GetActor() != CurrentIntertactable)
+			{
+				FoundInteractable(ItemTraceresult.GetActor());
+				return;
+			}
+
+			//if its the same we dont need to do anything
+			if (ItemTraceresult.GetActor() == CurrentIntertactable)
+			{
+				return;
+			}
+		}
+	}
+
+	else
+	{
+		NoInteractableFound();
+	}
+	*/
+
+}
+
+bool UInventoryComponent::PerformTrace(FHitResult& OutHitResult, FVector& OutHitLocation)
+{
+	FVector2D VierportSize;
+
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(VierportSize);
+	}
+	FVector2D CrossHairWorldLocation{ VierportSize.X / 2.0f, VierportSize.Y / 2.0f }; //Divides the screen in  half to set crosshairs
+	FVector CrossHairWorldDirection;
+	FVector CrossHairWorldPosition;
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrossHairWorldLocation,
+		CrossHairWorldPosition,
+		CrossHairWorldDirection);
+	if (bScreenToWorld)
+	{
+		const FVector Start{ CrossHairWorldPosition }; //Trace from center of the Screen outwards
+		const FVector End{ Start + CrossHairWorldDirection * 50'000.f };
+		OutHitLocation = End;
+
+		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECollisionChannel::ECC_Visibility);
+		DrawDebugLine(
+			GetWorld(),
+			Start,
+			End,
+			FColor::Red,
+			false, -1, 0,
+			1.0f);
+		if (OutHitResult.bBlockingHit)
+		{
+			OutHitLocation = OutHitResult.Location;
+			return true;
+		}
+	}
+	return false;
+}
+
 void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -481,4 +614,5 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(UInventoryComponent, InventoryList);
 	DOREPLIFETIME(UInventoryComponent, CurrentItem);
 	DOREPLIFETIME(UInventoryComponent, InventoryTags);
+	DOREPLIFETIME(UInventoryComponent, bCanTraceItemActorTag);
 }

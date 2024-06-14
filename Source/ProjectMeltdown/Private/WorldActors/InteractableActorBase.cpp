@@ -13,6 +13,8 @@
 #include "Components/SphereComponent.h"
 #include "Inventory/InventoryComponent.h"
 #include "Inventory/InventoryItemInstance.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/BoxComponent.h"
 
 /*
 #include "Blueprint/UserWidget.h"
@@ -34,9 +36,13 @@ AInteractableActorBase::AInteractableActorBase()
 	bReplicates = true;
 	SetReplicateMovement(true);
 
+	//BoxComps = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComps"));
+	//BoxComps->SetupAttachment(RootComponent);
+
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("USphereComponent"));
 	SphereComponent->SetupAttachment(RootComponent);
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AInteractableActorBase::OnSphereOverlap);
+	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &AInteractableActorBase::OnSphereOverlapEnd);
 }
 
 void AInteractableActorBase::Init(UInventoryItemInstance* InInstance)
@@ -135,9 +141,25 @@ void AInteractableActorBase::OnSphereOverlap(UPrimitiveComponent* OverlappedComp
 		FGameplayEventData EventPayload;
 		EventPayload.Instigator = this;
 		EventPayload.OptionalObject = ItemInstance;
-		EventPayload.EventTag = UInventoryComponent::EquipItemActorTag;
+		EventPayload.EventTag = UInventoryComponent::CanTraceItemActorTag;
 
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OtherActor, UInventoryComponent::EquipItemActorTag, EventPayload);
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OtherActor, UInventoryComponent::CanTraceItemActorTag, EventPayload);
+		UE_LOG(LogTemp, Log, TEXT("Sphere overlap: Payload sent to %s"), *OtherActor->GetName());
+
+	}
+}
+
+void AInteractableActorBase::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
+{
+	if (HasAuthority())
+	{
+		FGameplayEventData EventPayload;
+		EventPayload.Instigator = this;
+		EventPayload.OptionalObject = ItemInstance;
+		EventPayload.EventTag = UInventoryComponent::RemoveCanTraceItemActorTag;
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OtherActor, UInventoryComponent::RemoveCanTraceItemActorTag, EventPayload);
+		UE_LOG(LogTemp, Log, TEXT("Sphere end overlap: Payload sent to %s"), *OtherActor->GetName());
 	}
 }
 
@@ -175,11 +197,34 @@ void AInteractableActorBase::InitInternal()
 
 }
 
+
+
 // Called every frame
 void AInteractableActorBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AInteractableActorBase::ShowItemWidget()
+{
+	if (ItemInstance && ItemInstance->GetItemStaticData()->ItemWidgetClass && !ItemWidget)
+	{
+		ItemWidget = CreateWidget<UUserWidget>(GetWorld(), ItemInstance->GetItemStaticData()->ItemWidgetClass);
+		if (ItemWidget)
+		{
+			ItemWidget->AddToViewport();
+		}
+	}
+}
+
+void AInteractableActorBase::HideItemWidget()
+{
+	if (ItemWidget)
+	{
+		ItemWidget->RemoveFromParent();
+		ItemWidget = nullptr;
+	}
 }
 
 void AInteractableActorBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
