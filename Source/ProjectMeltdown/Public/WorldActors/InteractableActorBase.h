@@ -37,7 +37,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(ReplicatedUsing = OnRep_ItemInstance)
-	UInventoryItemInstance* ItemInstance = nullptr;
+	UInventoryItemInstance* ItemInstance;
+	//TWeakObjectPtr<UInventoryItemInstance> ItemInstance;
+	
 
 	UFUNCTION()
 	void OnRep_ItemInstance(UInventoryItemInstance* OldItemInstance);
@@ -55,18 +57,17 @@ protected:
 	//class UBoxComponent* BoxComps;
 	//FORCEINLINE UBoxComponent* GetBoxComps() const { return BoxComps; }
 
-	UPROPERTY()
-	UUserWidget* ItemWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UWidgetComponent* InteractWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UBillboardComponent* SceneR;
 
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 	void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
-
-	void ShowItemWidget();
-	void HideItemWidget();
-
 
 
 	UPROPERTY(EditAnywhere)

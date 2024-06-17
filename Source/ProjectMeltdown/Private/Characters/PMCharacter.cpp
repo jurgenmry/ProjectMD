@@ -35,6 +35,9 @@
 //Inventory
 
 #include "Inventory/InventoryComponent.h"
+#include "Inventory/InventoryItemInstance.h"
+#include "WorldActors/InteractableActorBase.h"
+
 
 APMCharacter::APMCharacter()
 	//: EquippedItem(nullptr)
@@ -237,10 +240,20 @@ void APMCharacter::OnUnequipTriggered(const FInputActionValue& Value)
 
 void APMCharacter::OnEquipItem(const FInputActionValue& Value)
 {
-	FGameplayEventData EventPayload;
-	EventPayload.EventTag = UInventoryComponent::EquipItemActorTag;
+	UInventoryComponent* IVComponent = GetInventoryComponent();
+	if (IVComponent && IVComponent->bCanTraceItemActorTag && IVComponent->TracedItemInstance)
+	{
+		FGameplayEventData EventPayload;
+		// Use the actor associated with the traced item as the instigator
+		AInteractableActorBase* Ins = Cast<AInteractableActorBase>(IVComponent->TracedItemInstance->GetItemActor());
+		EventPayload.Instigator = Ins;
+		EventPayload.OptionalObject = IVComponent->TracedItemInstance;
+		EventPayload.EventTag = UInventoryComponent::EquipItemActorTag;
 
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItemActorTag, EventPayload);
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItemActorTag, EventPayload);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Printf(TEXT("Interact key pressed: Payload sent with OptionalObject: %s"), IVComponent->TracedItemInstance ? *IVComponent->TracedItemInstance->GetName() : TEXT("None")));
+		
+	}
 }
 
 void APMCharacter::OnEquipItem1Triggered(const FInputActionValue& Value)

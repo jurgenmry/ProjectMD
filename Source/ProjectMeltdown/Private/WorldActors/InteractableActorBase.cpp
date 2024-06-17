@@ -15,6 +15,13 @@
 #include "Inventory/InventoryItemInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/BoxComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Components/BillboardComponent.h"
+
+//Custome includes
+#include "Controllers/PMMainCharacterPlayerController.h"
+#include "Characters/PMCharacter.h"
+
 
 /*
 #include "Blueprint/UserWidget.h"
@@ -28,7 +35,6 @@
 #include "UI/HUD/PMBaseHud.h"
 */
 
-// Sets default values
 AInteractableActorBase::AInteractableActorBase()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -36,19 +42,77 @@ AInteractableActorBase::AInteractableActorBase()
 	bReplicates = true;
 	SetReplicateMovement(true);
 
-	//BoxComps = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComps"));
-	//BoxComps->SetupAttachment(RootComponent);
+	//SceneR = CreateDefaultSubobject<UBillboardComponent>(TEXT("SceneR"));
+	//SetRootComponent(SceneR);
+	//SceneR->SetMobility(EComponentMobility::Movable);
+	//SceneR->SetIsReplicated(true);
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("USphereComponent"));
 	SphereComponent->SetupAttachment(RootComponent);
+
+	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
+	InteractWidget->SetupAttachment(GetRootComponent());
+
+	
+
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AInteractableActorBase::OnSphereOverlap);
 	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &AInteractableActorBase::OnSphereOverlapEnd);
 }
 
+void AInteractableActorBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void AInteractableActorBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		if (!IsValid(ItemInstance) && IsValid(ItemStaticDataClass))
+		{
+			ItemInstance = NewObject<UInventoryItemInstance>();
+			ItemInstance->Init(ItemStaticDataClass, Quantity);
+
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("ItemInstance created: %s"), *ItemInstance->GetName()));
+			SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			SphereComponent->SetGenerateOverlapEvents(true);
+
+			InitInternal();
+		}
+	}
+
+	if (ItemInstance && ItemInstance->GetItemStaticData()->ItemWidgetClass)
+	{
+		InteractWidget->SetWidgetClass(ItemInstance->GetItemStaticData()->ItemWidgetClass);/// CreateWidget<UUserWidget>(GetWorld(), );
+		if (InteractWidget)
+		{
+			InteractWidget->SetVisibility(false);
+		}
+	}
+}
+
+void AInteractableActorBase::InitInternal()
+{
+
+}
+
+
+
+void AInteractableActorBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AInteractableActorBase, ItemInstance);
+	DOREPLIFETIME(AInteractableActorBase, ItemState);
+	DOREPLIFETIME(AInteractableActorBase, Quantity);
+}
+
+
 void AInteractableActorBase::Init(UInventoryItemInstance* InInstance)
 {
 	ItemInstance = InInstance;
-
 	InitInternal();
 }
 
@@ -88,7 +152,7 @@ void AInteractableActorBase::OnDropped()
 		const FVector Location = GetActorLocation();
 		const FVector Forward = ActorOwner->GetActorForwardVector();
 
-		const float droppItemDist = 100.f;
+		const float droppItemDist = 200.f;
 		const float droppItemTraceDist = 10000.f;
 
 		const FVector TraceStart = Location + Forward * droppItemDist;
@@ -136,21 +200,37 @@ void AInteractableActorBase::OnRep_ItemState()
 
 void AInteractableActorBase::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	
+	if (OtherActor != this && OtherActor)
+	{	
+		APMCharacter* Character = Cast<APMCharacter>(OtherActor);
+		if (Character && Character->IsLocallyControlled())
+		{
+			InteractWidget->SetVisibility(true);
+		}
+	}
+	
 	if (HasAuthority())
 	{
 		FGameplayEventData EventPayload;
 		EventPayload.Instigator = this;
 		EventPayload.OptionalObject = ItemInstance;
-		EventPayload.EventTag = UInventoryComponent::CanTraceItemActorTag;
+		EventPayload.EventTag = UInventoryComponent::EquipItemActorTag;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OtherActor, UInventoryComponent::EquipItemActorTag, EventPayload);
 
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OtherActor, UInventoryComponent::CanTraceItemActorTag, EventPayload);
-		UE_LOG(LogTemp, Log, TEXT("Sphere overlap: Payload sent to %s"), *OtherActor->GetName());
-
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Sphere overlap: Payload sent to %s with ItemInstance: %s"), *OtherActor->GetName(), ItemInstance ? *ItemInstance->GetName() : TEXT("None")));
+		//UE_LOG(LogTemp, Log, TEXT("Sphere overlap: Payload sent to %s with ItemInstance: %s"), *OtherActor->GetName(), ItemInstance ? *ItemInstance->GetName() : TEXT("None"));
 	}
 }
 
 void AInteractableActorBase::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
 {
+	
+	APMCharacter* Character = Cast<APMCharacter>(OtherActor);
+	if (Character && Character->IsLocallyControlled())
+	{
+		InteractWidget->SetVisibility(false);
+	}
 	if (HasAuthority())
 	{
 		FGameplayEventData EventPayload;
@@ -159,7 +239,10 @@ void AInteractableActorBase::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedC
 		EventPayload.EventTag = UInventoryComponent::RemoveCanTraceItemActorTag;
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OtherActor, UInventoryComponent::RemoveCanTraceItemActorTag, EventPayload);
-		UE_LOG(LogTemp, Log, TEXT("Sphere end overlap: Payload sent to %s"), *OtherActor->GetName());
+		
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Sphere end overlap: Payload sent to %s with ItemInstance: %s"), *OtherActor->GetName(), ItemInstance ? *ItemInstance->GetName() : TEXT("None")));
+		//UE_LOG(LogTemp, Log, TEXT("Sphere end overlap: Payload sent to %s with ItemInstance: %s"), *OtherActor->GetName(), ItemInstance ? *ItemInstance->GetName() : TEXT("None"));
+
 	}
 }
 
@@ -172,69 +255,9 @@ bool AInteractableActorBase::ReplicateSubobjects(class UActorChannel* Channel, c
 	return WroteSomething;
 }
 
-// Called when the game starts or when spawned
-void AInteractableActorBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (HasAuthority())
-	{
-		if (!IsValid(ItemInstance) && IsValid(ItemStaticDataClass))
-		{
-			ItemInstance = NewObject<UInventoryItemInstance>();
-			ItemInstance->Init(ItemStaticDataClass, Quantity);
-
-			SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-			SphereComponent->SetGenerateOverlapEvents(true);
-
-			InitInternal();
-		}
-	}
-}
-
-void AInteractableActorBase::InitInternal()
-{
-
-}
 
 
 
-// Called every frame
-void AInteractableActorBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-void AInteractableActorBase::ShowItemWidget()
-{
-	if (ItemInstance && ItemInstance->GetItemStaticData()->ItemWidgetClass && !ItemWidget)
-	{
-		ItemWidget = CreateWidget<UUserWidget>(GetWorld(), ItemInstance->GetItemStaticData()->ItemWidgetClass);
-		if (ItemWidget)
-		{
-			ItemWidget->AddToViewport();
-		}
-	}
-}
-
-void AInteractableActorBase::HideItemWidget()
-{
-	if (ItemWidget)
-	{
-		ItemWidget->RemoveFromParent();
-		ItemWidget = nullptr;
-	}
-}
-
-void AInteractableActorBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AInteractableActorBase, ItemInstance);
-	DOREPLIFETIME(AInteractableActorBase, ItemState);
-	DOREPLIFETIME(AInteractableActorBase, Quantity);
-}
 
 
 

@@ -70,6 +70,14 @@ void UInventoryComponent::AddInventoryTagCount(FGameplayTag InTag, int32 CountDe
 void UInventoryComponent::EquipItemAtIndex(int32 Index)
 {
 	const FInventoryListItem* Item = InventoryList.GetItem(Index);
+	
+	//UnEquip the currently Equipped item
+	if (CurrentItem)
+	{
+		UnequipItem();
+	}
+
+	//Equip the new item from index
 	if (Item)
 	{
 		EquipItemInstance(Item->ItemInstance);
@@ -425,20 +433,35 @@ void UInventoryComponent::HandleGameplayEventInternal(FGameplayEventData Payload
 	if (NetRole == ROLE_Authority)
 	{
 		FGameplayTag EventTag = Payload.EventTag;
-		UE_LOG(LogTemp, Log, TEXT("Handling gameplay event: %s"), *EventTag.ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Handling gameplay event: %s"), *EventTag.ToString()));
+
 
 		if (EventTag == UInventoryComponent::EquipItemActorTag)
 		{
+			/*
+				if (Payload.OptionalObject)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("EquipItemActorTag: OptionalObject is valid: %s"), *Payload.OptionalObject->GetName()));
+				}
+				else
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("EquipItemActorTag: OptionalObject is null")));
+				}
+				*/
+
 			if (const UInventoryItemInstance* ItemInstance = Cast<UInventoryItemInstance>(Payload.OptionalObject))
 			{
 				AddItemInstance(const_cast<UInventoryItemInstance*>(ItemInstance));
-
-				if (Payload.Instigator)
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("EquipItemActorTag: Item equipped: %s"), *ItemInstance->GetName()));
+		
+				if (Payload.Instigator && Payload.Instigator.Get())
 				{
-					const_cast<AActor*>(Payload.Instigator.Get())->Destroy();
+						const_cast<AActor*>(Payload.Instigator.Get())->Destroy();
 				}
+				
 			}
 		}
+	
 		else if (EventTag == UInventoryComponent::EquipNextTag)
 		{
 			EquipNext();
@@ -454,13 +477,14 @@ void UInventoryComponent::HandleGameplayEventInternal(FGameplayEventData Payload
 		else if (EventTag == UInventoryComponent::CanTraceItemActorTag) //CD
 		{
 			bCanTraceItemActorTag = true;
-			UE_LOG(LogTemp, Log, TEXT("CanTraceItemActorTag set to true"));
+			TracedItemInstance = Cast<UInventoryItemInstance>(Payload.OptionalObject);  // Store the traced item instance
 		}
 
 		else if (EventTag == UInventoryComponent::RemoveCanTraceItemActorTag) //CD
 		{
 			bCanTraceItemActorTag = false;
-			UE_LOG(LogTemp, Log, TEXT("CanTraceItemActorTag set to false"));
+			TracedItemInstance = nullptr;
+
 		}
 		else if (EventTag == UInventoryComponent::EquipItem1Tag) //CD
 		{
@@ -533,15 +557,15 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	}
 }
 
-void UInventoryComponent::TraceForItems()
+void UInventoryComponent::TraceForItems(UInventoryItemInstance* InItemInstance)
 {
-	FVector HitLocation; //Maybe this need to be adjusted
-	FHitResult ItemTraceresult;
-	PerformTrace(ItemTraceresult, HitLocation);
+	//FVector HitLocation; //Maybe this need to be adjusted
+	//FHitResult ItemTraceresult;
+	//PerformTrace(ItemTraceresult, HitLocation);
 
-	if (ItemTraceresult.bBlockingHit)
-	{
-	}	//Test code
+	//if (ItemTraceresult.bBlockingHit)
+	//{
+	//}	//Test code
 		/*
 		if (ItemTraceresult.GetActor()->GetClass()->ImplementsInterface(UInteractInterface::StaticClass()))
 		{
@@ -615,4 +639,5 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME(UInventoryComponent, CurrentItem);
 	DOREPLIFETIME(UInventoryComponent, InventoryTags);
 	DOREPLIFETIME(UInventoryComponent, bCanTraceItemActorTag);
+	DOREPLIFETIME(UInventoryComponent, TracedItemInstance);
 }

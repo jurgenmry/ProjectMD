@@ -88,11 +88,13 @@ public:
 	UPROPERTY(Replicated)
 	FInventoryList InventoryList;
 
+	UPROPERTY(Replicated)
+	UInventoryItemInstance* TracedItemInstance;
+
 protected:
 
 	UFUNCTION()
 	void AddInventoryTags();
-
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<UItemStaticData>> DefaultItems;
@@ -112,7 +114,7 @@ protected:
 
 
 	//Tracing for checking item / ui
-	void TraceForItems();
+	void TraceForItems(UInventoryItemInstance* InItemInstance);
 	bool PerformTrace(FHitResult& OutHitResult, FVector& OutHitLocation);
 
 public:

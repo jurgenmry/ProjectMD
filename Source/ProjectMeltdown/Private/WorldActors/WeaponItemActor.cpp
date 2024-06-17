@@ -40,6 +40,7 @@ void AWeaponItemActor::InitInternal()
 				SkeletalComp->RegisterComponent();
 				SkeletalComp->SetSkeletalMesh(WeaponData->SkeletalMesh);
 				SkeletalComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				SkeletalComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 				MeshComponent = SkeletalComp;
 			}
@@ -50,6 +51,7 @@ void AWeaponItemActor::InitInternal()
 			StaticComp->RegisterComponent();
 			StaticComp->SetStaticMesh(WeaponData->StaticMesh);
 			StaticComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			StaticComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 			MeshComponent = StaticComp;
 		}

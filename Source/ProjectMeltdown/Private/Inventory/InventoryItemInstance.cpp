@@ -56,8 +56,8 @@ void UInventoryItemInstance::OnEquipped(AActor* InOwner)
 		ItemActor->OnEquipped();
 		ItemActor->FinishSpawning(Transform);
 
-		ACharacter* Character = Cast<ACharacter>(InOwner);
-		if (USkeletalMeshComponent* SkeletalMesh = Character ? Character->GetMesh() : nullptr)
+		APMCharacter* Character = Cast<APMCharacter>(InOwner);
+		if (USkeletalMeshComponent* SkeletalMesh = Character ? Character->GetMesh1P() : nullptr)
 		{
 			ItemActor->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, StaticData->AttachmentSocket);
 		}
