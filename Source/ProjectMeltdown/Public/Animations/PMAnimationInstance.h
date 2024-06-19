@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Inventory/ItemStaticData.h"
+#include "DataAssets/CharacterAnimDataAsset.h"
 #include "PMAnimationInstance.generated.h"
 
 
-class UItemStaticData;
+
 
 UCLASS()
 class PROJECTMELTDOWN_API UPMAnimationInstance : public UAnimInstance
@@ -31,7 +33,7 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (BlueprintThreadSafe))
 	class UAnimSequenceBase* GetCrouchIdleAnimation() const;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Animation")
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	class UCharacterAnimDataAsset* DefaultCharacterAnimDataAsset;
 	
 };
