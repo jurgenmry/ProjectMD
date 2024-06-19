@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(BlueprintType, Blueprintable)
+UCLASS()
 class PROJECTMELTDOWN_API UCharacterAnimDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
