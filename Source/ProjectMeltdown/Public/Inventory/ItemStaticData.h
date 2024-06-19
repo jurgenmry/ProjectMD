@@ -27,8 +27,8 @@ struct FCharacterData
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "GAS")
 	TArray<TSubclassOf<class UGameplayAbility>> Abilities;
 
-	//UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Animation")
-	//class UCharacterAnimDataAsset* CharacterAnimDataAsset;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Animation")
+	class UCharacterAnimDataAsset* CharacterAnimDataAsset;
 };
 
 USTRUCT(BlueprintType)

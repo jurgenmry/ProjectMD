@@ -13,7 +13,7 @@ class UGameplayEffect;
 class UAbilitySystemComponent;
 
 UENUM(BlueprintType)
-enum class EffectApplicationPolicy
+enum class EffectApplicationPolicy : uint8
 {
 	ApplyOnOverlap,
 	AppyInEndOverlap,
@@ -21,7 +21,7 @@ enum class EffectApplicationPolicy
 };
 
 UENUM(BlueprintType)
-enum class EffectRemovalPolicy
+enum class EffectRemovalPolicy : uint8
 {
 	RemoveOnEndOverlap,
 	DoNotApply

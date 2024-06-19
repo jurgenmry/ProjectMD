@@ -477,7 +477,7 @@ void UInventoryComponent::HandleGameplayEventInternal(FGameplayEventData Payload
 		else if (EventTag == UInventoryComponent::CanTraceItemActorTag) //CD
 		{
 			bCanTraceItemActorTag = true;
-			TracedItemInstance = Cast<UInventoryItemInstance>(Payload.OptionalObject);  // Store the traced item instance
+			//TracedItemInstance = Cast<UInventoryItemInstance>(Payload.OptionalObject);  // Store the traced item instance
 		}
 
 		else if (EventTag == UInventoryComponent::RemoveCanTraceItemActorTag) //CD

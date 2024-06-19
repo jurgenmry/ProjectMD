@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Characters/PMBaseCharacter.h"
 #include "InputActionValue.h"
+
+#include "Inventory/ItemStaticData.h"
 #include "PMCharacter.generated.h"
 
 
@@ -94,6 +96,12 @@ public:
 	void OnEquipItem4Triggered(const FInputActionValue& Value); //CD
 
 
+	UFUNCTION(BlueprintCallable)
+	FCharacterAnimationData GetCharacterData() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetCharacterData(const FCharacterAnimationData& InCharacterData);
+
 
 protected:
 
@@ -109,8 +117,18 @@ protected:
 
 
 
+//Character data
 
+	UPROPERTY()//ReplicatedUsing = OnRep_CharacterData)
+	FCharacterAnimationData CharacterAnimDataData;
 
+	//UFUNCTION()
+	//void OnRep_CharacterData();
+
+	//virtual void InitFromCharacterData(const FCharacterData& InCharacterData, bool bFromReplication = false);
+
+	UPROPERTY(EditDefaultsOnly)
+	class UCharacterAnimDataAsset* CharacterAnimDataAsset;
 
 
 

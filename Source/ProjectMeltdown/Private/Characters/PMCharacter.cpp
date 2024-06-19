@@ -20,10 +20,6 @@
 #include "AbilitySystem/PMBaseAbilitySystemComponent.h"
 #include "AbilitySystem/PMBaseAttributeSet.h"
 #include "UI/HUD/PMBaseHud.h"
-#include "Interfaces/InteractInterface.h"
-#include "WorldActors/InteractableActorBase.h"
-#include "WorldActors/PickUpBaseActor.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 
 // Input component
@@ -235,9 +231,6 @@ void APMCharacter::OnUnequipTriggered(const FInputActionValue& Value)
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::UnequipTag, EventPayload);
 }
 
-
-
-
 void APMCharacter::OnEquipItem(const FInputActionValue& Value)
 {
 	UInventoryComponent* IVComponent = GetInventoryComponent();
@@ -344,10 +337,34 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 
 
+// DATA
 
 
+FCharacterAnimationData APMCharacter::GetCharacterData() const
+{
+	return CharacterAnimDataData;
+}
 
+void APMCharacter::SetCharacterData(const FCharacterAnimationData& InCharacterData)
+{
+	CharacterAnimDataData = InCharacterData;
 
+	//InitFromCharacterData(CharacterData);
+}
+
+/*
+void APMCharacter::OnRep_CharacterData()
+{
+	InitFromCharacterData(CharacterData, true);
+}
+*/
+
+/*
+void APMCharacter::InitFromCharacterData(const FCharacterData& InCharacterData, bool bFromReplication)
+{
+
+}
+*/
 
 
 
