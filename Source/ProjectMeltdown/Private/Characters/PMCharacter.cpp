@@ -73,6 +73,17 @@ void APMCharacter::BeginPlay()
 	{
 		SetActorTickEnabled(false);
 	}
+
+	
+	if (Mesh1P && GetMesh())
+	{
+		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		if (AnimInstance)
+		{
+			GetMesh()->SetAnimInstanceClass(AnimInstance->GetClass());
+		}
+	}
+	
 }
 
 void APMCharacter::Tick(float DeltaSeconds)
