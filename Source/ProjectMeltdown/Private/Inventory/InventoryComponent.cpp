@@ -97,8 +97,8 @@ void UInventoryComponent::AddInventoryTags()
 	
 	UInventoryComponent::EquipItem1Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.EquipItem1"), TEXT("Add Item on Slot 1"));
 	UInventoryComponent::EquipItem2Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.EquipItem2"), TEXT("Equip item on Slot2"));
-	UInventoryComponent::EquipItem3Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.EquipItem3"));
-	UInventoryComponent::EquipItem4Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.EquipItem4"));
+	UInventoryComponent::EquipItem3Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.EquipItem3"));
+	UInventoryComponent::EquipItem4Tag = TagsManager.AddNativeGameplayTag(TEXT("Event.Inventory.EquipItem4"));
 
 	TagsManager.OnLastChanceToAddNativeTags().RemoveAll(this);
 }

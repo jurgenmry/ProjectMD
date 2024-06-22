@@ -95,6 +95,11 @@ public:
 	FGameplayTag Attributes_Secondary_CarriyingCapacity;
 
 	
+	/* State Tags */
+	FGameplayTag Movement_State_Crouch;
+	FGameplayTag Movement_State_Sprint;
+	FGameplayTag Movement_State_Dead;
+
 
 protected:
 

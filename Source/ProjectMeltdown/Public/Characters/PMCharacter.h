@@ -48,6 +48,11 @@ public:
 	virtual int32 GetPlayerlevel() override;
 
 
+	// Action Tags
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagContainer CrouchTags;
+
+
 	// Inventory 
 	UInventoryComponent* GetInventoryComponent() const;
 
@@ -61,11 +66,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* UnequipInputAction;
 
-
-
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* EquipItem; //CD
-
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* EquipItem1InputAction;    //CD
@@ -78,6 +80,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* EquipItem4InputAction;  //CD
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* CrouchInputAction;
 
 
 	// Input actions: 
@@ -94,6 +99,10 @@ public:
 	void OnEquipItem2Triggered(const FInputActionValue& Value); //CD
 	void OnEquipItem3Triggered(const FInputActionValue& Value); //CD
 	void OnEquipItem4Triggered(const FInputActionValue& Value); //CD
+
+	void OnCrouchActionStarted(const FInputActionValue& Value);
+
+	void OnCrouchActionEnded(const FInputActionValue& Value);
 
 
 	UFUNCTION(BlueprintCallable)

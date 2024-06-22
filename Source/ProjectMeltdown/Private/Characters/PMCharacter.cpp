@@ -150,27 +150,22 @@ void APMCharacter::InitAbilityActorInfo()
 
 		AttributeSet->SetHealth(100.0f);
 		InitializeAttributes();
+		AddCharacterAbilities();
 	
 		//Get need the player controller to access the hud, so we need to cast to our own PC
 		APMMainCharacterPlayerController* PC = Cast<APMMainCharacterPlayerController>(GetController());
 		if (PC)
 		{
-			
-
-
 			//We need to cast the result to our own hud
 			APMBaseHud* BaseHud = Cast<APMBaseHud>(PC->GetHUD());
 			if (BaseHud)
 			{
 				BaseHud->InitOverlay(PC, MainPlayerState, AbilitySystemComponent, AttributeSet);
 			}
-
-
 			if (InventoryComponent)
 			{
 				InventoryComponent->InitCustomeComponent(AbilitySystemComponent);
 			}
-
 		}
 
 		/* Custome code based on Trenak (Needs Review for implementation)
@@ -292,6 +287,23 @@ void APMCharacter::OnEquipItem4Triggered(const FInputActionValue& Value)
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem4Tag, EventPayload);
 }
 
+void APMCharacter::OnCrouchActionStarted(const FInputActionValue& Value)
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->TryActivateAbilitiesByTag(CrouchTags, true);
+	}
+}
+
+void APMCharacter::OnCrouchActionEnded(const FInputActionValue& Value)
+{
+	if (AbilitySystemComponent)
+	{
+
+		AbilitySystemComponent->CancelAbilities(&CrouchTags);
+	}
+}
+
 void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -313,9 +325,6 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			{
 				PlayerEnhancedInputComponent->BindAction(UnequipInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnUnequipTriggered);
 			}
-
-
-
 
 			if (EquipItem)
 			{
@@ -340,6 +349,12 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			if (EquipItem4InputAction)
 			{
 				PlayerEnhancedInputComponent->BindAction(EquipItem4InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem4Triggered);
+			}
+
+			if (CrouchInputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(CrouchInputAction, ETriggerEvent::Started, this, &APMCharacter::OnCrouchActionStarted);
+				PlayerEnhancedInputComponent->BindAction(CrouchInputAction, ETriggerEvent::Completed, this, &APMCharacter::OnCrouchActionEnded);
 			}
 		}
 	}

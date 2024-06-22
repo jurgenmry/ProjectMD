@@ -93,4 +93,18 @@ void FPMGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Secondary_CarriyingCapacity = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.CarriyingCapacity"),
 		FString("How much weight we can carry"));
+
+
+	/* State Tags */
+	GameplayTags.Movement_State_Crouch = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Movement.State.Crouch"),
+		FString("If we are alowed to crouch or not"));
+
+	GameplayTags.Movement_State_Sprint = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Movement.State.Sprint"),
+		FString("If we are alowed to sprint or not"));
+
+	GameplayTags.Movement_State_Dead = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Movement.State.Dead"),
+		FString("If we are dead"));
 }
