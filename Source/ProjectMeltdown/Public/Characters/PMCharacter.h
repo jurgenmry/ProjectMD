@@ -85,6 +85,10 @@ public:
 	class UInputAction* CrouchInputAction;
 
 
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* AttackInputAction;
+
+
 	// Input actions: 
 
 	void OnDropItemTriggered(const FInputActionValue& Value);
@@ -104,6 +108,15 @@ public:
 
 	void OnCrouchActionEnded(const FInputActionValue& Value);
 
+	void OnAttackActionStarted(const FInputActionValue& Value);
+
+	void OnAttackActionEnded(const FInputActionValue& Value);
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag AttackStartedEventTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag AttackEndedEventTag;
 
 	UFUNCTION(BlueprintCallable)
 	FCharacterAnimationData GetCharacterData() const;
@@ -111,6 +124,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCharacterData(const FCharacterAnimationData& InCharacterData);
 
+	virtual void FinishDying() override;
 
 protected:
 

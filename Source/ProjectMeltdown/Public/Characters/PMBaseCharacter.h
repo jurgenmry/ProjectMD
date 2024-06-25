@@ -1,12 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "ProjectMeltdown/ProjectMeltdown.h"
+#include "GameplayTagContainer.h"
 #include "AbilitySystemInterface.h"
 #include "Interfaces/CombatInterface.h"
 #include "PMBaseCharacter.generated.h"
+
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterBaseHitReactDelegate, EGDHitReactDirection, Direction);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedDelegate, APMBaseCharacter*, Character);
+
 
 UCLASS(Abstract)
 class PROJECTMELTDOWN_API APMBaseCharacter : public ACharacter, public IAbilitySystemInterface , public ICombatInterface
@@ -23,6 +29,43 @@ public:
 	class UPMBaseAttributeSet* GetAttributeSetBase() const;
 
 	virtual int32 GetPlayerlevel() override;
+
+	/* NEW CODE */
+
+	// Set the Hit React direction in the Animation Blueprint
+	UPROPERTY(BlueprintAssignable)
+	FCharacterBaseHitReactDelegate ShowHitReact;
+
+	UPROPERTY(BlueprintAssignable)
+	FCharacterDiedDelegate OnCharacterDied;
+
+	UFUNCTION(BlueprintCallable)
+	EGDHitReactDirection GetHitReactDirection(const FVector& ImpactPoint);
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool IsAlive() const;
+
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	virtual void PlayHitReact(FGameplayTag HitDirection, AActor* DamageCauser);
+
+	virtual void Die();
+
+	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDCharacter")
+	virtual void FinishDying();
+
+	// Death Animation
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "GASDocumentation|Animation")
+	UAnimMontage* DeathMontage;
+
+	FGameplayTag HitDirectionFrontTag;
+	FGameplayTag HitDirectionBackTag;
+	FGameplayTag HitDirectionRightTag;
+	FGameplayTag HitDirectionLeftTag;
+	FGameplayTag DeadTag;
+	FGameplayTag EffectRemoveOnDeathTag;
+
+	/* END OF NEW CODE */
 
 protected:
 	

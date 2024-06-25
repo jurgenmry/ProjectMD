@@ -99,12 +99,19 @@ public:
 	FGameplayTag Movement_State_Crouch;
 	FGameplayTag Movement_State_Sprint;
 	FGameplayTag Movement_State_Dead;
+	FGameplayTag Movement_State_RemoveOnDeathTag;
 
+	/*Hit character*/
+	FGameplayTag Hit_Direction_FrontTag;
+	FGameplayTag Hit_Direction_BackTag;
+	FGameplayTag Hit_Direction_RightTag;
+	FGameplayTag Hit_Direction_LeftTag;
 
-protected:
+	
+	FGameplayTag Attack_StartedEventTag;
+	FGameplayTag Attack_EndedEventTag;
 
-
-private:
 
 	static FPMGameplayTags GameplayTags;
+	
 };

@@ -107,4 +107,39 @@ void FPMGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Movement_State_Dead = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Movement.State.Dead"),
 		FString("If we are dead"));
+
+	GameplayTags.Movement_State_RemoveOnDeathTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Movement.State.RemoveOnDeath"),
+		FString("If we are dead"));
+
+	/* Hit Character Tags */
+	GameplayTags.Hit_Direction_FrontTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Hit.Direction.Front"),
+		FString("Add Tags when hit front"));
+
+	GameplayTags.Hit_Direction_BackTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Hit.Direction.Back"),
+		FString("Add Tags when hit Back"));
+
+
+	GameplayTags.Hit_Direction_RightTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Hit.Direction.Back"),
+		FString("Add Tags when hit front"));
+
+
+	GameplayTags.Hit_Direction_LeftTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Hit.Direction.Left"),
+		FString("Add Tags when hit Left"));
+
+
+	GameplayTags.Attack_StartedEventTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attack.StartedEventTag"),
+		FString("Add Tags when hit front"));
+
+
+	GameplayTags.Attack_EndedEventTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attack.EndedEventTag"),
+		FString("Add Tags when hit Left"));
+
+
 }

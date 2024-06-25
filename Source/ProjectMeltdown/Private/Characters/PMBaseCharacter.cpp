@@ -6,15 +6,33 @@
 //System includes
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameplayTagsManager.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 //custome includes
 #include "AbilitySystem/PMBaseAbilitySystemComponent.h"
 #include "AbilitySystem/PMBaseAttributeSet.h"
+#include "PMGameplayTags.h"
 
 
 APMBaseCharacter::APMBaseCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Overlap);
+
+	bAlwaysRelevant = true;
+
+
+	// Cache tags
+	HitDirectionFrontTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Front"));
+	HitDirectionBackTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Back"));
+	HitDirectionRightTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Back"));
+	HitDirectionLeftTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Left"));
+	DeadTag = FGameplayTag::RequestGameplayTag(FName("Movement.State.Dead"));
+	EffectRemoveOnDeathTag = FGameplayTag::RequestGameplayTag(FName("Movement.State.RemoveOnDeath"));
+	
 }
 
 UAbilitySystemComponent* APMBaseCharacter::GetAbilitySystemComponent() const
@@ -27,12 +45,10 @@ UPMBaseAttributeSet* APMBaseCharacter::GetAttributeSetBase() const
 	return AttributeSet.Get();
 }
 
-
 int32 APMBaseCharacter::GetPlayerlevel()
 {
 	return 0;
 }
-
 
 void APMBaseCharacter::BeginPlay()
 {
@@ -42,7 +58,6 @@ void APMBaseCharacter::BeginPlay()
 void APMBaseCharacter::InitAbilityActorInfo()
 {
 }
-
 
 void APMBaseCharacter::InitializeAttributes()
 {
@@ -98,7 +113,6 @@ void APMBaseCharacter::RemoveCharacterAbilities()
 	AbilitySystemComponent->bCharacterAbilitiesGiven = false;
 }
 
-
 void APMBaseCharacter::ApplyGEToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level)
 {
 	if (!AbilitySystemComponent)
@@ -122,7 +136,6 @@ void APMBaseCharacter::ApplyGEToSelf(TSubclassOf<UGameplayEffect> GameplayEffect
 		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
 	}
 }
-
 
 float APMBaseCharacter::GetHealth() const
 {
@@ -257,3 +270,113 @@ void APMBaseCharacter::SetOxigen(float Oxigen)
 }
 
 
+
+EGDHitReactDirection APMBaseCharacter::GetHitReactDirection(const FVector& ImpactPoint)
+{
+	const FVector& ActorLocation = GetActorLocation();
+	// PointPlaneDist is super cheap - 1 vector subtraction, 1 dot product.
+	float DistanceToFrontBackPlane = FVector::PointPlaneDist(ImpactPoint, ActorLocation, GetActorRightVector());
+	float DistanceToRightLeftPlane = FVector::PointPlaneDist(ImpactPoint, ActorLocation, GetActorForwardVector());
+
+
+	if (FMath::Abs(DistanceToFrontBackPlane) <= FMath::Abs(DistanceToRightLeftPlane))
+	{
+		// Determine if Front or Back
+
+		// Can see if it's left or right of Left/Right plane which would determine Front or Back
+		if (DistanceToRightLeftPlane >= 0)
+		{
+			return EGDHitReactDirection::Front;
+		}
+		else
+		{
+			return EGDHitReactDirection::Back;
+		}
+	}
+	else
+	{
+		// Determine if Right or Left
+
+		if (DistanceToFrontBackPlane >= 0)
+		{
+			return EGDHitReactDirection::Right;
+		}
+		else
+		{
+			return EGDHitReactDirection::Left;
+		}
+	}
+
+	return EGDHitReactDirection::Front;
+}
+
+bool APMBaseCharacter::IsAlive() const
+{
+	return GetHealth() > 0.0f;
+}
+
+
+void APMBaseCharacter::PlayHitReact_Implementation(FGameplayTag HitDirection, AActor* DamageCauser)
+{
+	if (IsAlive())
+	{
+		if (HitDirection == HitDirectionLeftTag)
+		{
+			ShowHitReact.Broadcast(EGDHitReactDirection::Left);
+		}
+		else if (HitDirection == HitDirectionFrontTag)
+		{
+			ShowHitReact.Broadcast(EGDHitReactDirection::Front);
+		}
+		else if (HitDirection == HitDirectionRightTag)
+		{
+			ShowHitReact.Broadcast(EGDHitReactDirection::Right);
+		}
+		else if (HitDirection == HitDirectionBackTag)
+		{
+			ShowHitReact.Broadcast(EGDHitReactDirection::Back);
+		}
+	}
+}
+
+bool APMBaseCharacter::PlayHitReact_Validate(FGameplayTag HitDirection, AActor* DamageCauser)
+{
+	return true;
+}
+
+void APMBaseCharacter::Die()
+{
+	// Only runs on Server
+	RemoveCharacterAbilities();
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->GravityScale = 0;
+	GetCharacterMovement()->Velocity = FVector(0);
+
+	OnCharacterDied.Broadcast(this);
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->CancelAllAbilities();
+
+		FGameplayTagContainer EffectTagsToRemove;
+		EffectTagsToRemove.AddTag(EffectRemoveOnDeathTag);
+		int32 NumEffectsRemoved = AbilitySystemComponent->RemoveActiveEffectsWithTags(EffectTagsToRemove);
+
+		AbilitySystemComponent->AddLooseGameplayTag(DeadTag);
+	}
+
+	if (DeathMontage)
+	{
+		PlayAnimMontage(DeathMontage);
+	}
+	else
+	{
+		FinishDying();
+	}
+}
+
+void APMBaseCharacter::FinishDying()
+{
+	Destroy();
+}

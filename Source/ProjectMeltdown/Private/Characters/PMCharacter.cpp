@@ -41,20 +41,26 @@ APMCharacter::APMCharacter()
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
+
+
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+
+	GetMesh()->SetupAttachment(FirstPersonCameraComponent);
+
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
-	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
+	Mesh1P->SetupAttachment(GetMesh());
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
-	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+	//Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+	
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	InventoryComponent->SetIsReplicated(true);
@@ -304,6 +310,24 @@ void APMCharacter::OnCrouchActionEnded(const FInputActionValue& Value)
 	}
 }
 
+void APMCharacter::OnAttackActionStarted(const FInputActionValue& Value)
+{
+
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = AttackStartedEventTag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, AttackStartedEventTag, EventPayload);
+}
+
+void APMCharacter::OnAttackActionEnded(const FInputActionValue& Value)
+{
+	FGameplayEventData EventPayload;
+	EventPayload.EventTag = AttackEndedEventTag;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, AttackEndedEventTag, EventPayload);
+
+}
+
 void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -356,6 +380,12 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 				PlayerEnhancedInputComponent->BindAction(CrouchInputAction, ETriggerEvent::Started, this, &APMCharacter::OnCrouchActionStarted);
 				PlayerEnhancedInputComponent->BindAction(CrouchInputAction, ETriggerEvent::Completed, this, &APMCharacter::OnCrouchActionEnded);
 			}
+
+			if (AttackInputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Started, this, &APMCharacter::OnAttackActionStarted);
+				PlayerEnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Completed, this, &APMCharacter::OnAttackActionEnded);
+			}
 		}
 	}
 
@@ -376,6 +406,11 @@ void APMCharacter::SetCharacterData(const FCharacterAnimationData& InCharacterDa
 	CharacterAnimDataData = InCharacterData;
 
 	//InitFromCharacterData(CharacterData);
+}
+
+void APMCharacter::FinishDying()
+{
+
 }
 
 /*

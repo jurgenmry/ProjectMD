@@ -16,6 +16,7 @@ class AInteractableActorBase;
 class UWidgetComponent;
 
 
+
 USTRUCT(BlueprintType)
 struct FCharacterData
 {

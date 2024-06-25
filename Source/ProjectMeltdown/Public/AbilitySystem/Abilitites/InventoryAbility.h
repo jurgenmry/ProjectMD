@@ -10,6 +10,8 @@
 /* THIS ABILITY SHOULD BE PARENT OF ALL C++ ABILITIES */
 /*      THERE WAS A MISTAKE ON NAMING     */
 
+
+
 UCLASS()
 class PROJECTMELTDOWN_API UInventoryAbility : public UGameplayAbility
 {
