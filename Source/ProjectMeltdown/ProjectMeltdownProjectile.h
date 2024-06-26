@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+#include "Inventory/ItemStaticData.h"
 #include "ProjectMeltdownProjectile.generated.h"
 
 class USphereComponent;
@@ -14,24 +16,32 @@ class AProjectMeltdownProjectile : public AActor
 {
 	GENERATED_BODY()
 
-	/** Sphere collision component */
-	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
-	USphereComponent* CollisionComp;
-
-	/** Projectile movement component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* ProjectileMovement;
-
 public:
+	// Sets default values for this actor's properties
 	AProjectMeltdownProjectile();
 
-	/** called when projectile hits something */
-	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	const UProjectileStaticData* GetProjectileStaticData() const;
 
-	/** Returns CollisionComp subobject **/
-	USphereComponent* GetCollisionComp() const { return CollisionComp; }
-	/** Returns ProjectileMovement subobject **/
-	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	TSubclassOf<UProjectileStaticData> ProjectileDataClass;
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UPROPERTY()
+	class UProjectileMovementComponent* ProjectileMovementComponent = nullptr;
+
+	void DebugDrawPath() const;
+
+	UPROPERTY()
+	class UStaticMeshComponent* StaticMeshComponent = nullptr;
+
+	UFUNCTION()
+	void OnProjectileStop(const FHitResult& ImpactResult);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
 

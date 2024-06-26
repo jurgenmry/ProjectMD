@@ -7,9 +7,8 @@
 #include "Inventory/ItemStaticData.h"
 #include "ProjectMeltdownStatics.generated.h"
 
-/**
- * 
- */
+class AProjectMeltdownProjectile;
+
 UCLASS()
 class PROJECTMELTDOWN_API UProjectMeltdownStatics : public UBlueprintFunctionLibrary
 {
@@ -25,7 +24,7 @@ public:
 	static void ApplyRadialDamage(UObject* WorldContextObject, AActor* DamageCauser, FVector Location, float Radius, float DamageAmount, TArray<TSubclassOf<class UGameplayEffect>> DamageEffects,
 	const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes, ETraceTypeQuery TraceType);
 
-	//UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
-	//static AProjectile* LaunchProjectile(UObject* WorldContextObject, TSubclassOf<UProjectileStaticData> ProjectileDataClass, FTransform Transform, AActor* Owner, APawn* Instigator);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static AProjectMeltdownProjectile* LaunchProjectile(UObject* WorldContextObject, TSubclassOf<UProjectileStaticData> ProjectileDataClass, FTransform Transform, AActor* Owner, APawn* Instigator);
 
 };

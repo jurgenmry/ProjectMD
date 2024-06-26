@@ -3,30 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Abilitites/ApplyInventoryAbility.h"
+#include "AbilitySystem/Abilitites/GA_InventoryCombatAbility.h"
 #include "FireGun.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PROJECTMELTDOWN_API UFireGun : public UApplyInventoryAbility
+class PROJECTMELTDOWN_API UFireGun : public UGA_InventoryCombatAbility
 {
 	GENERATED_BODY()
-
-public:
-
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual bool CommitAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, OUT FGameplayTagContainer* OptionalRelevantTags) override;
-
-
-	UFUNCTION(BlueprintPure)
-	FGameplayEffectSpecHandle GetWeaponEffectSpec(const FHitResult& InHitResult);
-
-	UFUNCTION(BlueprintPure)
-	const bool GetWeaponToFocusTraceResult(float TraceDistance, ETraceTypeQuery TraceType, FHitResult& OutHitResult);
-
-
-
-
 };

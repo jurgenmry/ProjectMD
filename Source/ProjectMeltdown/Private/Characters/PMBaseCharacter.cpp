@@ -26,12 +26,12 @@ APMBaseCharacter::APMBaseCharacter()
 
 
 	// Cache tags
-	HitDirectionFrontTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Front"));
-	HitDirectionBackTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Back"));
-	HitDirectionRightTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Back"));
-	HitDirectionLeftTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Left"));
-	DeadTag = FGameplayTag::RequestGameplayTag(FName("Movement.State.Dead"));
-	EffectRemoveOnDeathTag = FGameplayTag::RequestGameplayTag(FName("Movement.State.RemoveOnDeath"));
+	//HitDirectionFrontTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Front"));
+	//HitDirectionBackTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Back"));
+	//HitDirectionRightTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Back"));
+	//HitDirectionLeftTag = FGameplayTag::RequestGameplayTag(FName("Hit.Direction.Left"));
+	//DeadTag = FGameplayTag::RequestGameplayTag(FName("Movement.State.Dead"));
+	//EffectRemoveOnDeathTag = FGameplayTag::RequestGameplayTag(FName("Movement.State.RemoveOnDeath"));
 	
 }
 

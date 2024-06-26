@@ -6,7 +6,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
-//#include "Actors/Projectile.h"
+#include "ProjectMeltdown/ProjectMeltdownProjectile.h"
 
 static TAutoConsoleVariable<int32> CVarShowRadialDamage(
 	TEXT("ShowRadialDamage"),
@@ -105,14 +105,14 @@ void UProjectMeltdownStatics::ApplyRadialDamage(UObject* WorldContextObject, AAc
 	}
 }
 
-/*
-AProjectile* UProjectMeltdownStatics::LaunchProjectile(UObject* WorldContextObject, TSubclassOf<UProjectileStaticData> ProjectileDataClass, FTransform Transform, AActor* Owner, APawn* Instigator)
+
+AProjectMeltdownProjectile* UProjectMeltdownStatics::LaunchProjectile(UObject* WorldContextObject, TSubclassOf<UProjectileStaticData> ProjectileDataClass, FTransform Transform, AActor* Owner, APawn* Instigator)
 {
 	UWorld* World = WorldContextObject ? WorldContextObject->GetWorld() : nullptr;
 
 	if (World && World->GetNetMode() < ENetMode::NM_Client)
 	{
-		if (AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(), Transform, Owner, Instigator, ESpawnActorCollisionHandlingMethod::AlwaysSpawn))
+		if (AProjectMeltdownProjectile* Projectile = World->SpawnActorDeferred<AProjectMeltdownProjectile>(AProjectMeltdownProjectile::StaticClass(), Transform, Owner, Instigator, ESpawnActorCollisionHandlingMethod::AlwaysSpawn))
 		{
 			Projectile->ProjectileDataClass = ProjectileDataClass;
 			Projectile->FinishSpawning(Transform);
@@ -123,4 +123,3 @@ AProjectile* UProjectMeltdownStatics::LaunchProjectile(UObject* WorldContextObje
 
 	return nullptr;
 }
-*/
