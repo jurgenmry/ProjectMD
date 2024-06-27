@@ -126,10 +126,10 @@ public:
 
 	virtual void FinishDying() override;
 
-protected:
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	UInventoryComponent* InventoryComponent = nullptr;
+
+protected:
 
 	// Client only
 	virtual void OnRep_PlayerState() override;

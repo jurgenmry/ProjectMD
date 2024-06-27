@@ -63,6 +63,7 @@ APMCharacter::APMCharacter()
 	
 
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	InventoryComponent->ComponentTags.Add(FName("Inventory"));
 	InventoryComponent->SetIsReplicated(true);
 
 }

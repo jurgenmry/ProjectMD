@@ -134,12 +134,24 @@ void FPMGameplayTags::InitializeNativeGameplayTags()
 
 	GameplayTags.Attack_StartedEventTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attack.StartedEventTag"),
-		FString("Add Tags when hit front"));
+		FString("When attack starts"));
 
 
 	GameplayTags.Attack_EndedEventTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attack.EndedEventTag"),
-		FString("Add Tags when hit Left"));
+		FString("When attack end"));
 
+	/* Abilitites */
+
+	GameplayTags.Ability_Combat_SingleShot = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Combat.SingleShot"),
+		FString("To single shoot a weapon"));
+
+
+	/* Notifies */
+
+	GameplayTags.Ability_Combat_Shoot = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Ability.Combat.Shoot"),
+		FString("Add when we shoot weapon"));
 
 }

@@ -13,9 +13,18 @@ void UApplyInventoryAbility::OnGiveAbility(const FGameplayAbilityActorInfo* Acto
 {
 	Super::OnGiveAbility(ActorInfo, Spec);
 
-	//APMCharacter* Character = GetActionGameCharacterFromActorInfo();
-	//InventoryComponent = Character->GetInventoryComponent();
+	APMCharacter* Character = Cast<APMCharacter>(ActorInfo->AvatarActor);
+	if (Character->GetInventoryComponent())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Invenotry not null")));
+		InventoryComponent = Cast<UInventoryComponent>(Character->InventoryComponent);
+	}
+	else
+	{
 
+	}
+	
+	/*
 	InventoryComponent = ActorInfo->OwnerActor.Get()->FindComponentByClass<UInventoryComponent>();
 	if (InventoryComponent)
 	{
@@ -25,6 +34,7 @@ void UApplyInventoryAbility::OnGiveAbility(const FGameplayAbilityActorInfo* Acto
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("null")));
 	}
+	*/
 }
 
 UInventoryComponent* UApplyInventoryAbility::GetInventoryComponent() const

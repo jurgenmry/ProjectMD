@@ -14,7 +14,7 @@
 
 bool UGA_InventoryCombatAbility::CommitAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, OUT FGameplayTagContainer* OptionalRelevantTags)
 {
-	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
+	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags ) && HasEnoughAmmo();
 }
 
 bool UGA_InventoryCombatAbility::HasEnoughAmmo() const

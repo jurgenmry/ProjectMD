@@ -45,6 +45,6 @@ public:
 protected:
 
 	UPROPERTY()
-	UInventoryComponent* InventoryComponent = nullptr;
+	UInventoryComponent* InventoryComponent;
 	
 };

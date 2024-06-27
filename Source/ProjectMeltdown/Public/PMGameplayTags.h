@@ -112,6 +112,10 @@ public:
 	FGameplayTag Attack_EndedEventTag;
 
 
+	/*Ability Tags*/
+	FGameplayTag Ability_Combat_SingleShot;
+	FGameplayTag Ability_Combat_Shoot; //Event.Combat.Shoot
+
 	static FPMGameplayTags GameplayTags;
 	
 };
