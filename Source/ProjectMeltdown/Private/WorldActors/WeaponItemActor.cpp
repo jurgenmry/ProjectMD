@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Inventory/ItemStaticData.h"
 #include "NiagaraFunctionLibrary.h"
-//#include "PhysicalMaterials/AG_PhysicalMaterial.h"
+#include "PhysicalMaterials/UAG_PhysicalMaterial.h"
 
 AWeaponItemActor::AWeaponItemActor()
 {
@@ -81,10 +81,10 @@ void AWeaponItemActor::MulticastPlayWeaponEffects_Implementation(const FHitResul
 
 void AWeaponItemActor::PlayWeaponEffectsInternal(const FHitResult& InHitResult)
 {
-	/*
+	
 	if (InHitResult.PhysMaterial.Get())
 	{
-		UAG_PhysicalMaterial* PhysicalMaterial = Cast<UAG_PhysicalMaterial>(InHitResult.PhysMaterial.Get());
+		UUAG_PhysicalMaterial* PhysicalMaterial = Cast<UUAG_PhysicalMaterial>(InHitResult.PhysMaterial.Get());
 
 		if (PhysicalMaterial)
 		{
@@ -98,7 +98,6 @@ void AWeaponItemActor::PlayWeaponEffectsInternal(const FHitResult& InHitResult)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, WeaponData->AttackSound, GetActorLocation(), 1.f);
 	}
-	*/
 }
 
 

@@ -62,6 +62,10 @@ void FPMGameplayTags::InitializeNativeGameplayTags()
 
 	/* Secondary Attribute Tags */
 
+	GameplayTags.Attibutes_Secondary_Health = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Secondary.Health"),
+		FString("How Much Health We have"));
+
 	GameplayTags.Attributes_Primary_Resilience = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Attributes.Secondary.Armor"),
 		FString("how strong you are against attacks"));

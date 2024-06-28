@@ -85,6 +85,7 @@ public:
 	FGameplayTag Attributes_Primary_Resilience;
 
 	/* Secondary Attribute Tags */
+	FGameplayTag Attibutes_Secondary_Health;
 	FGameplayTag Attributes_Secondary_Armor;
 	FGameplayTag Attributes_Secondary_ArmorPenetration;
 	FGameplayTag Attributes_Secondary_BlockChance;
