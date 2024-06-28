@@ -57,10 +57,23 @@ void UInventoryItemInstance::OnEquipped(AActor* InOwner)
 		ItemActor->FinishSpawning(Transform);
 
 		APMCharacter* Character = Cast<APMCharacter>(InOwner);
-		if (USkeletalMeshComponent* SkeletalMesh = Character ? Character->GetMesh1P() : nullptr)
+		if (Character->IsLocallyControlled())
 		{
-			ItemActor->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, StaticData->AttachmentSocket);
+			USkeletalMeshComponent* SkeletalMesh1p = Character->GetMesh1P();
+			if (SkeletalMesh1p)//USkeletalMeshComponent* SkeletalMesh = Character ? Character->GetMesh1P() : nullptr)
+			{
+				ItemActor->AttachToComponent(SkeletalMesh1p, FAttachmentTransformRules::SnapToTargetNotIncludingScale, StaticData->AttachmentSocket);
+			}
 		}
+		else
+		{
+			USkeletalMeshComponent* SkeletalMesh3p = Character->GetMesh3P();
+			if (SkeletalMesh3p)//USkeletalMeshComponent* SkeletalMesh = Character ? Character->GetMesh() : nullptr)
+			{
+				ItemActor->AttachToComponent(SkeletalMesh3p, FAttachmentTransformRules::SnapToTargetNotIncludingScale, StaticData->TPAttachmentSocket);
+			}
+		}
+
 	}
 
 	TryGrantAbilities(InOwner);

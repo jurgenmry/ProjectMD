@@ -29,6 +29,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	USkeletalMeshComponent* Mesh1P;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	USkeletalMeshComponent* Mesh3P;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
 
@@ -37,6 +40,8 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+
+	USkeletalMeshComponent* GetMesh3P() const { return Mesh3P; }
 	
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 

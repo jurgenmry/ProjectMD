@@ -103,6 +103,9 @@ public:
 	FName AttachmentSocket = NAME_None;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName TPAttachmentSocket = NAME_None;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanBeEquipped = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
