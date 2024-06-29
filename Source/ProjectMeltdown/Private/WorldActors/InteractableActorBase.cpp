@@ -16,6 +16,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/BoxComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/BillboardComponent.h"
 
 //Custome includes
@@ -47,8 +48,13 @@ AInteractableActorBase::AInteractableActorBase()
 	//SceneR->SetMobility(EComponentMobility::Movable);
 	//SceneR->SetIsReplicated(true);
 
+
+	BaseSK = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BaseSK"));
+	SetRootComponent(BaseSK);
+
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("USphereComponent"));
-	SphereComponent->SetupAttachment(RootComponent);
+	SphereComponent->SetupAttachment(BaseSK);
+	//SphereComponent->SetIsReplicated(true);
 
 	InteractWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractWidget"));
 	InteractWidget->SetupAttachment(GetRootComponent());

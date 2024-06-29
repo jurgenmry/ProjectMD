@@ -38,5 +38,7 @@ protected:
 	UMeshComponent* MeshComponent = nullptr;
 
 	virtual void InitInternal() override;
+
+	
 	
 };

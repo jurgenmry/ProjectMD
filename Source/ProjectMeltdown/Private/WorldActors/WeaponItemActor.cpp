@@ -10,6 +10,10 @@
 #include "NiagaraFunctionLibrary.h"
 #include "PhysicalMaterials/UAG_PhysicalMaterial.h"
 
+
+//Custome includes
+#include "Net/UnrealNetwork.h"
+
 AWeaponItemActor::AWeaponItemActor()
 {
 
@@ -99,8 +103,6 @@ void AWeaponItemActor::PlayWeaponEffectsInternal(const FHitResult& InHitResult)
 		UGameplayStatics::PlaySoundAtLocation(this, WeaponData->AttackSound, GetActorLocation(), 1.f);
 	}
 }
-
-
 
 
 

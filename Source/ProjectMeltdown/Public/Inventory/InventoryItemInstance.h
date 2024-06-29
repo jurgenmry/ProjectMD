@@ -32,12 +32,9 @@ public:
 	UPROPERTY(Replicated)
 	TSubclassOf<UItemStaticData> ItemDataClass;
 
-	UPROPERTY(ReplicatedUsing = OnRep_Equipped)
+	UPROPERTY(Replicated)
 	bool bEquipped = false;
 	
-	UFUNCTION()
-	void OnRep_Equipped();
-
 
 	virtual void OnEquipped(AActor* InOwner = nullptr);
 	virtual void OnUnEquipped(AActor* InOwner = nullptr);
@@ -55,8 +52,11 @@ public:
 
 protected:
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_ItemActor)
 	AInteractableActorBase* ItemActor = nullptr;
+
+	UFUNCTION()
+	void OnRep_ItemActor();
 
 	UPROPERTY(Replicated)
 	int32 Quantity = 1;

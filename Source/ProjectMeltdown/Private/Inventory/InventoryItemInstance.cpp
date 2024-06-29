@@ -19,6 +19,7 @@
 #include "Inventory/ItemStaticData.h"
 
 
+
 void UInventoryItemInstance::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -26,7 +27,10 @@ void UInventoryItemInstance::GetLifetimeReplicatedProps(TArray<class FLifetimePr
 	DOREPLIFETIME(UInventoryItemInstance, ItemDataClass);
 	DOREPLIFETIME(UInventoryItemInstance, ItemActor);
 	DOREPLIFETIME(UInventoryItemInstance, Quantity);
+	DOREPLIFETIME(UInventoryItemInstance, bEquipped);
 }
+
+
 
 void UInventoryItemInstance::Init(TSubclassOf<UItemStaticData> InItemStaticDataClass, int32 InQuantity)
 {
@@ -39,10 +43,6 @@ const UItemStaticData* UInventoryItemInstance::GetItemStaticData() const
 	return UProjectMeltdownStatics::GetItemStaticData(ItemDataClass);
 }
 
-void UInventoryItemInstance::OnRep_Equipped()
-{
-	
-}
 
 void UInventoryItemInstance::OnEquipped(AActor* InOwner)
 {
@@ -57,23 +57,25 @@ void UInventoryItemInstance::OnEquipped(AActor* InOwner)
 		ItemActor->FinishSpawning(Transform);
 
 		APMCharacter* Character = Cast<APMCharacter>(InOwner);
+
+		USkeletalMeshComponent* TargetMesh = nullptr;
+		FName SocketName;
+
 		if (Character->IsLocallyControlled())
 		{
-			USkeletalMeshComponent* SkeletalMesh1p = Character->GetMesh1P();
-			if (SkeletalMesh1p)//USkeletalMeshComponent* SkeletalMesh = Character ? Character->GetMesh1P() : nullptr)
-			{
-				ItemActor->AttachToComponent(SkeletalMesh1p, FAttachmentTransformRules::SnapToTargetNotIncludingScale, StaticData->AttachmentSocket);
-			}
+			TargetMesh = Character->GetMesh1P();
+			SocketName = StaticData->AttachmentSocket;
 		}
 		else
 		{
-			USkeletalMeshComponent* SkeletalMesh3p = Character->GetMesh3P();
-			if (SkeletalMesh3p)//USkeletalMeshComponent* SkeletalMesh = Character ? Character->GetMesh() : nullptr)
-			{
-				ItemActor->AttachToComponent(SkeletalMesh3p, FAttachmentTransformRules::SnapToTargetNotIncludingScale, StaticData->TPAttachmentSocket);
-			}
+			TargetMesh = Character->GetMesh3P();
+			SocketName = StaticData->TPAttachmentSocket;
 		}
 
+		if (TargetMesh && TargetMesh->DoesSocketExist(SocketName))
+		{
+			ItemActor->AttachToComponent(TargetMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+		}
 	}
 
 	TryGrantAbilities(InOwner);
@@ -82,6 +84,43 @@ void UInventoryItemInstance::OnEquipped(AActor* InOwner)
 
 	bEquipped = true;
 }
+
+void UInventoryItemInstance::OnRep_ItemActor()
+{
+	if (ItemActor && ItemActor->GetOwner())
+	{
+		APMCharacter* Character = Cast<APMCharacter>(ItemActor->GetOwner());
+		if (Character)
+		{
+			// Attach to the correct mesh based on local control
+			const UItemStaticData* StaticData = GetItemStaticData();
+			if (!StaticData)
+			{
+				return;
+			}
+
+			USkeletalMeshComponent* TargetMesh = nullptr;
+			FName SocketName;
+
+			if (Character->IsLocallyControlled())
+			{
+				TargetMesh = Character->GetMesh1P();
+				SocketName = StaticData->AttachmentSocket;
+			}
+			else
+			{
+				TargetMesh = Character->GetMesh3P();
+				SocketName = StaticData->TPAttachmentSocket;
+			}
+
+			if (TargetMesh && TargetMesh->DoesSocketExist(SocketName))
+			{
+				ItemActor->AttachToComponent(TargetMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+			}
+		}
+	}
+}
+
 
 void UInventoryItemInstance::OnUnEquipped(AActor* InOwner)
 {
