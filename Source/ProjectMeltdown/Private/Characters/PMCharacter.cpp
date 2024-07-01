@@ -402,16 +402,26 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 // DATA
 
 
-FCharacterAnimationData APMCharacter::GetCharacterData() const
+FCharacterAnimationData APMCharacter::GetCharacterData3P() const
 {
-	return CharacterAnimDataData;
+	return CharacterAnimDataData3P;
 }
 
-void APMCharacter::SetCharacterData(const FCharacterAnimationData& InCharacterData)
+void APMCharacter::SetCharacterData3P(const FCharacterAnimationData& InCharacterData)
 {
-	CharacterAnimDataData = InCharacterData;
+	CharacterAnimDataData3P = InCharacterData;
 
 	//InitFromCharacterData(CharacterData);
+}
+
+FCharacterAnimationData APMCharacter::GetCharacterData1FP() const
+{
+	return CharacterAnimDataData1FP;
+}
+
+void APMCharacter::SetCharacterData1FP(const FCharacterAnimationData& InCharacterData)
+{
+	CharacterAnimDataData1FP = InCharacterData;
 }
 
 void APMCharacter::FinishDying()

@@ -112,6 +112,9 @@ public:
 	FCharacterAnimationData CharacterAnimationData;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FCharacterAnimationData CharacterAnimationData1FP;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<TSubclassOf<UGameplayAbility>> GrantedAbilities;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

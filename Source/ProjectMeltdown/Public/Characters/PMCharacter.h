@@ -124,11 +124,17 @@ public:
 	FGameplayTag AttackEndedEventTag;
 
 	UFUNCTION(BlueprintCallable)
-	FCharacterAnimationData GetCharacterData() const;
+	FCharacterAnimationData GetCharacterData3P() const;
 
 	UFUNCTION(BlueprintCallable)
-	void SetCharacterData(const FCharacterAnimationData& InCharacterData);
+	void SetCharacterData3P(const FCharacterAnimationData& InCharacterData);
 
+	UFUNCTION(BlueprintCallable)
+	FCharacterAnimationData GetCharacterData1FP() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetCharacterData1FP(const FCharacterAnimationData& InCharacterData);
+	
 	virtual void FinishDying() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
@@ -148,15 +154,25 @@ protected:
 //Character data
 
 	UPROPERTY()//ReplicatedUsing = OnRep_CharacterData)
-	FCharacterAnimationData CharacterAnimDataData;
+	FCharacterAnimationData CharacterAnimDataData3P;
+
+	UPROPERTY()
+	FCharacterAnimationData CharacterAnimDataData1FP;
+
+
+	UPROPERTY(EditDefaultsOnly)
+	class UCharacterAnimDataAsset* CharacterAnimDataAsset3P;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UCharacterAnimDataAsset* CharacterAnimDataAsset1FP;
+
 
 	//UFUNCTION()
 	//void OnRep_CharacterData();
 
 	//virtual void InitFromCharacterData(const FCharacterData& InCharacterData, bool bFromReplication = false);
 
-	UPROPERTY(EditDefaultsOnly)
-	class UCharacterAnimDataAsset* CharacterAnimDataAsset;
+
 
 
 

@@ -39,7 +39,7 @@ UBlendSpace* UPMAnimationInstance::GetLocomotionBlendspace() const
 			}
 		}
 
-		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData();
+		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData3P();
 
 		if (Data.MovementBlendspace)
 		{
@@ -47,7 +47,7 @@ UBlendSpace* UPMAnimationInstance::GetLocomotionBlendspace() const
 		}
 	}
 
-	return DefaultCharacterAnimDataAsset ? DefaultCharacterAnimDataAsset->CharacterAnimationData.MovementBlendspace : nullptr;
+	return DefaultCharacterAnimDataAsset3P ? DefaultCharacterAnimDataAsset3P->CharacterAnimationData.MovementBlendspace : nullptr;
 }
 
 UAnimSequenceBase* UPMAnimationInstance::GetIdleAnimation() const
@@ -62,7 +62,7 @@ UAnimSequenceBase* UPMAnimationInstance::GetIdleAnimation() const
 			}
 		}
 
-		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData();
+		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData3P();
 
 		if (Data.IdleAnimationAsset)
 		{
@@ -70,9 +70,11 @@ UAnimSequenceBase* UPMAnimationInstance::GetIdleAnimation() const
 		}
 	}
 
-	return DefaultCharacterAnimDataAsset ? DefaultCharacterAnimDataAsset->CharacterAnimationData.IdleAnimationAsset : nullptr;
+	return DefaultCharacterAnimDataAsset3P ? DefaultCharacterAnimDataAsset3P->CharacterAnimationData.IdleAnimationAsset : nullptr;
 
 }
+
+
 
 UBlendSpace* UPMAnimationInstance::GetCrouchLocomotionBlendspace() const
 {
@@ -86,7 +88,7 @@ UBlendSpace* UPMAnimationInstance::GetCrouchLocomotionBlendspace() const
 			}
 		}
 
-		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData();
+		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData3P();
 
 		if (Data.CrouchMovementBlendspace)
 		{
@@ -94,8 +96,10 @@ UBlendSpace* UPMAnimationInstance::GetCrouchLocomotionBlendspace() const
 		}
 	}
 
-	return DefaultCharacterAnimDataAsset ? DefaultCharacterAnimDataAsset->CharacterAnimationData.CrouchMovementBlendspace : nullptr;
+	return DefaultCharacterAnimDataAsset3P ? DefaultCharacterAnimDataAsset3P->CharacterAnimationData.CrouchMovementBlendspace : nullptr;
 }
+
+
 
 UAnimSequenceBase* UPMAnimationInstance::GetCrouchIdleAnimation() const
 {
@@ -110,7 +114,7 @@ UAnimSequenceBase* UPMAnimationInstance::GetCrouchIdleAnimation() const
 		}
 
 		// this should be change to avoid using CharacterData
-		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData();
+		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData3P();
 
 		if (Data.CrouchIdleAnimationAsset)
 		{
@@ -118,5 +122,106 @@ UAnimSequenceBase* UPMAnimationInstance::GetCrouchIdleAnimation() const
 		}
 	}
 
-	return DefaultCharacterAnimDataAsset ? DefaultCharacterAnimDataAsset->CharacterAnimationData.CrouchIdleAnimationAsset : nullptr;	
+	return DefaultCharacterAnimDataAsset3P ? DefaultCharacterAnimDataAsset3P->CharacterAnimationData.CrouchIdleAnimationAsset : nullptr;
+}
+
+///////////////////////////////////////////////////////////////////
+//
+//                          FIRST PERSON
+//
+///////////////////////////////////////////////////////////////////
+
+
+UBlendSpace* UPMAnimationInstance::Get1FPLocomotionBlendspace() const
+{
+	if (APMCharacter* ActionGameCharacter = Cast<APMCharacter>(GetOwningActor()))
+	{
+		if (const UItemStaticData* ItemData = GetEquippedItemData())
+		{
+			if (ItemData->CharacterAnimationData1FP.MovementBlendspace)
+			{
+				return ItemData->CharacterAnimationData1FP.MovementBlendspace;
+			}
+		}
+
+		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData1FP();
+
+		if (Data.MovementBlendspace)
+		{
+			return Data.MovementBlendspace;
+		}
+	}
+
+	return DefaultCharacterAnimDataAsset1FP ? DefaultCharacterAnimDataAsset1FP->CharacterAnimationData.MovementBlendspace : nullptr;
+}
+
+UAnimSequenceBase* UPMAnimationInstance::Get1FPIdleAnimation() const
+{
+	if (APMCharacter* ActionGameCharacter = Cast<APMCharacter>(GetOwningActor()))
+	{
+		if (const UItemStaticData* ItemData = GetEquippedItemData())
+		{
+			if (ItemData->CharacterAnimationData1FP.IdleAnimationAsset)
+			{
+				return ItemData->CharacterAnimationData1FP.IdleAnimationAsset;
+			}
+		}
+
+		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData1FP();
+
+		if (Data.IdleAnimationAsset)
+		{
+			return Data.IdleAnimationAsset;
+		}
+	}
+
+	return DefaultCharacterAnimDataAsset1FP ? DefaultCharacterAnimDataAsset1FP->CharacterAnimationData.IdleAnimationAsset : nullptr;
+
+}
+
+UBlendSpace* UPMAnimationInstance::Get1FPCrouchLocomotionBlendspace() const
+{
+	if (APMCharacter* ActionGameCharacter = Cast<APMCharacter>(GetOwningActor()))
+	{
+		if (const UItemStaticData* ItemData = GetEquippedItemData())
+		{
+			if (ItemData->CharacterAnimationData1FP.CrouchMovementBlendspace)
+			{
+				return ItemData->CharacterAnimationData1FP.CrouchMovementBlendspace;
+			}
+		}
+
+		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData1FP();
+
+		if (Data.CrouchMovementBlendspace)
+		{
+			return Data.CrouchMovementBlendspace;
+		}
+	}
+
+	return DefaultCharacterAnimDataAsset1FP ? DefaultCharacterAnimDataAsset1FP->CharacterAnimationData.CrouchMovementBlendspace : nullptr;
+}
+
+UAnimSequenceBase* UPMAnimationInstance::Get1FPCrouchIdleAnimation() const
+{
+	if (APMCharacter* ActionGameCharacter = Cast<APMCharacter>(GetOwningActor()))
+	{
+		if (const UItemStaticData* ItemData = GetEquippedItemData())
+		{
+			if (ItemData->CharacterAnimationData1FP.CrouchIdleAnimationAsset)
+			{
+				return ItemData->CharacterAnimationData1FP.CrouchIdleAnimationAsset;
+			}
+		}
+
+		// this should be change to avoid using CharacterData
+		FCharacterAnimationData Data = ActionGameCharacter->GetCharacterData1FP();
+
+		if (Data.CrouchIdleAnimationAsset)
+		{
+			return Data.CrouchIdleAnimationAsset;
+		}
+	}
+
+	return DefaultCharacterAnimDataAsset1FP ? DefaultCharacterAnimDataAsset1FP->CharacterAnimationData.CrouchIdleAnimationAsset : nullptr;
 }
