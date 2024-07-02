@@ -21,7 +21,7 @@ class PROJECTMELTDOWN_API APMBaseCharacter : public ACharacter, public IAbilityS
 
 public:
 	
-	APMBaseCharacter();
+	APMBaseCharacter(const class FObjectInitializer& ObjectInitializer);
 
 	// Implement IAbilitySystemInterface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;

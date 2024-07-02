@@ -14,7 +14,7 @@ class PROJECTMELTDOWN_API APMBaseEnemyCharacter : public APMBaseCharacter
 {
 	GENERATED_BODY()
 
-	APMBaseEnemyCharacter();
+	APMBaseEnemyCharacter(const class FObjectInitializer& ObjectInitializer);
 
 public:
 

@@ -35,7 +35,8 @@
 #include "WorldActors/InteractableActorBase.h"
 
 
-APMCharacter::APMCharacter()
+APMCharacter::APMCharacter(const class FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
 	//: EquippedItem(nullptr)
 {
 	// Set size for collision capsule
@@ -334,6 +335,24 @@ void APMCharacter::OnAttackActionEnded(const FInputActionValue& Value)
 
 }
 
+void APMCharacter::OnSprintActionStarted(const FInputActionValue& Value)
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->TryActivateAbilitiesByTag(SprintTags, true);
+	}
+}
+
+void APMCharacter::OnSprintActionEnded(const FInputActionValue& Value)
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->CancelAbilities(&SprintTags);
+	}
+}
+
+
+
 void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -387,10 +406,16 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 				PlayerEnhancedInputComponent->BindAction(CrouchInputAction, ETriggerEvent::Completed, this, &APMCharacter::OnCrouchActionEnded);
 			}
 
+			if (SprintInputAction)
+			{
+				PlayerEnhancedInputComponent->BindAction(SprintInputAction, ETriggerEvent::Started, this, &APMCharacter::OnSprintActionStarted);
+				PlayerEnhancedInputComponent->BindAction(SprintInputAction, ETriggerEvent::Completed, this, &APMCharacter::OnCrouchActionEnded);
+			}
+
 			if (AttackInputAction)
 			{
 				PlayerEnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Started, this, &APMCharacter::OnAttackActionStarted);
-				PlayerEnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Completed, this, &APMCharacter::OnAttackActionEnded);
+				PlayerEnhancedInputComponent->BindAction(AttackInputAction, ETriggerEvent::Completed, this, &APMCharacter::OnSprintActionEnded);
 			}
 		}
 	}
@@ -428,6 +453,10 @@ void APMCharacter::FinishDying()
 {
 
 }
+
+
+
+
 
 /*
 void APMCharacter::OnRep_CharacterData()

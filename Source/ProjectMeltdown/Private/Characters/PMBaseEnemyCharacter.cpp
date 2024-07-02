@@ -8,7 +8,8 @@
 #include "AbilitySystem/PMBaseAbilitySystemComponent.h"
 #include "AbilitySystem/PMBaseAttributeSet.h"
 
-APMBaseEnemyCharacter::APMBaseEnemyCharacter()
+APMBaseEnemyCharacter::APMBaseEnemyCharacter(const class FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer)
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UPMBaseAbilitySystemComponent>(TEXT("AbilitSystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);

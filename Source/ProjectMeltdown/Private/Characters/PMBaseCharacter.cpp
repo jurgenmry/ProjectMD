@@ -14,9 +14,11 @@
 #include "AbilitySystem/PMBaseAbilitySystemComponent.h"
 #include "AbilitySystem/PMBaseAttributeSet.h"
 #include "PMGameplayTags.h"
+#include "Components/PMMovementComponent.h"
 
 
-APMBaseCharacter::APMBaseCharacter()
+APMBaseCharacter::APMBaseCharacter(const class FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer.SetDefaultSubobjectClass<UPMMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = false;
 

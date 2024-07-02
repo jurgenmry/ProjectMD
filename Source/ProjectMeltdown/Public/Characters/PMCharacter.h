@@ -20,7 +20,7 @@ class PROJECTMELTDOWN_API APMCharacter : public APMBaseCharacter
 	GENERATED_BODY()
 
 
-	APMCharacter();
+	APMCharacter(const class FObjectInitializer& ObjectInitializer);
 
 
 public:
@@ -57,6 +57,15 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTagContainer CrouchTags;
 
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTagContainer SprintTags;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag AttackStartedEventTag;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag AttackEndedEventTag;
+
 
 	// Inventory 
 	UInventoryComponent* GetInventoryComponent() const;
@@ -89,9 +98,12 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* CrouchInputAction;
 
-
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* AttackInputAction;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UInputAction* SprintInputAction;
+
 
 
 	// Input actions: 
@@ -117,11 +129,9 @@ public:
 
 	void OnAttackActionEnded(const FInputActionValue& Value);
 
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayTag AttackStartedEventTag;
+	void OnSprintActionStarted(const FInputActionValue& Value);
 
-	UPROPERTY(EditDefaultsOnly)
-	FGameplayTag AttackEndedEventTag;
+	void OnSprintActionEnded(const FInputActionValue& Value);
 
 	UFUNCTION(BlueprintCallable)
 	FCharacterAnimationData GetCharacterData3P() const;
