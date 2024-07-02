@@ -362,42 +362,42 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		{
 			if (EquipNextInputAction)
 			{
-				PlayerEnhancedInputComponent->BindAction(EquipNextInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipNextTriggered);
+				PlayerEnhancedInputComponent->BindAction(EquipNextInputAction, ETriggerEvent::Started, this, &APMCharacter::OnEquipNextTriggered);
 			}
 
 			if (DropItemInputAction)
 			{
-				PlayerEnhancedInputComponent->BindAction(DropItemInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnDropItemTriggered);
+				PlayerEnhancedInputComponent->BindAction(DropItemInputAction, ETriggerEvent::Started, this, &APMCharacter::OnDropItemTriggered);
 			}
 
 			if (UnequipInputAction)
 			{
-				PlayerEnhancedInputComponent->BindAction(UnequipInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnUnequipTriggered);
+				PlayerEnhancedInputComponent->BindAction(UnequipInputAction, ETriggerEvent::Started, this, &APMCharacter::OnUnequipTriggered);
 			}
 
 			if (EquipItem)
 			{
-				PlayerEnhancedInputComponent->BindAction(EquipItem, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem);
+				PlayerEnhancedInputComponent->BindAction(EquipItem, ETriggerEvent::Started, this, &APMCharacter::OnEquipItem);
 			}
 
 			if (EquipItem1InputAction)
 			{
-				PlayerEnhancedInputComponent->BindAction(EquipItem1InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem1Triggered);
+				PlayerEnhancedInputComponent->BindAction(EquipItem1InputAction, ETriggerEvent::Started, this, &APMCharacter::OnEquipItem1Triggered);
 			}
 
 			if (EquipItem2InputAction)
 			{
-				PlayerEnhancedInputComponent->BindAction(EquipItem2InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem2Triggered);
+				PlayerEnhancedInputComponent->BindAction(EquipItem2InputAction, ETriggerEvent::Started, this, &APMCharacter::OnEquipItem2Triggered);
 			}
 
 			if (EquipItem3InputAction)
 			{
-				PlayerEnhancedInputComponent->BindAction(EquipItem3InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem3Triggered);
+				PlayerEnhancedInputComponent->BindAction(EquipItem3InputAction, ETriggerEvent::Started, this, &APMCharacter::OnEquipItem3Triggered);
 			}
 
 			if (EquipItem4InputAction)
 			{
-				PlayerEnhancedInputComponent->BindAction(EquipItem4InputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnEquipItem4Triggered);
+				PlayerEnhancedInputComponent->BindAction(EquipItem4InputAction, ETriggerEvent::Started, this, &APMCharacter::OnEquipItem4Triggered);
 			}
 
 			if (CrouchInputAction)
@@ -408,7 +408,7 @@ void APMCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 			if (SprintInputAction)
 			{
-				PlayerEnhancedInputComponent->BindAction(SprintInputAction, ETriggerEvent::Started, this, &APMCharacter::OnSprintActionStarted);
+				PlayerEnhancedInputComponent->BindAction(SprintInputAction, ETriggerEvent::Triggered, this, &APMCharacter::OnSprintActionStarted);
 				PlayerEnhancedInputComponent->BindAction(SprintInputAction, ETriggerEvent::Completed, this, &APMCharacter::OnCrouchActionEnded);
 			}
 
