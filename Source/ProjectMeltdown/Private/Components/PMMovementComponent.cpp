@@ -13,6 +13,8 @@ UPMMovementComponent::UPMMovementComponent()
 {
 	SprintSpeedMultiplier = 1.4f;
 	ADSSpeedMultiplier = 0.5f;
+
+	MaxWalkSpeed = 350.0f;
 }
 
 float UPMMovementComponent::GetMaxSpeed() const
