@@ -3,7 +3,13 @@
 
 #include "AbilitySystem/Abilitites/GA_Crouch.h"
 
+//System Includes
 #include "AbilitySystemComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Components/TimelineComponent.h"
+#include "Camera/CameraComponent.h"
+
+//Custome includes
 #include "Characters/PMCharacter.h"
 
 
@@ -22,10 +28,12 @@ bool UGA_Crouch::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 	const APMCharacter* Character = CastChecked<APMCharacter>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
 
+	/*
 	if (Character->CanCrouch())
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("Can crouch called successfully"));
 	}
+	*/
 	return Character->CanCrouch();
 }
 
@@ -35,13 +43,14 @@ void UGA_Crouch::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 
 	APMCharacter* Character = CastChecked<APMCharacter>(ActorInfo->AvatarActor.Get());
 	Character->Crouch();
-
 }
 
 void UGA_Crouch::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	APMCharacter* Character = CastChecked<APMCharacter>(ActorInfo->AvatarActor.Get());
 	Character->UnCrouch();
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
+
+
+

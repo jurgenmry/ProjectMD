@@ -151,6 +151,9 @@ public:
 	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UAnimMontage* AttackMontageFPS;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float FireRate;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

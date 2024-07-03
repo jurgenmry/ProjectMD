@@ -72,6 +72,12 @@ APMCharacter::APMCharacter(const class FObjectInitializer& ObjectInitializer)
 	InventoryComponent->ComponentTags.Add(FName("Inventory"));
 	InventoryComponent->SetIsReplicated(true);
 
+	// Initialize of Variables
+	CrouchedMeshRelativeLocation = FVector(0.0f, 0.0f, -55.0f);
+	UnCrouchedMeshRelativeLocation = FVector(0.0f,0.0f,-98.0f);
+
+	CrouchEyeOffset = FVector{ 0.0f };
+	CrouchSpeed = 12.0f;
 }
 
 void APMCharacter::BeginPlay()
@@ -103,7 +109,8 @@ void APMCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	//TraceForItems();
+	float CrouchInterpTime = FMath::Min(1, CrouchSpeed * DeltaSeconds);
+	CrouchEyeOffset = (1.0f - CrouchInterpTime) * CrouchEyeOffset;
 }
 
 void APMCharacter::PossessedBy(AController* NewController)
@@ -131,6 +138,67 @@ int32 APMCharacter::GetPlayerlevel()
 		MainPlayerState->GetCurrentLvl();
 	}
 	return 1;
+}
+
+void APMCharacter::AdjustMeshOnCrouch(bool bCrouching)
+{
+	FVector NewLocation = bCrouching ? CrouchedMeshRelativeLocation : UnCrouchedMeshRelativeLocation;
+
+	if (GetMesh3P())
+	{
+		GetMesh3P()->SetRelativeLocation(NewLocation);
+	}
+}
+
+void APMCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	if (HalfHeightAdjust == 0.0f)
+	{
+		return;
+	}
+	float StartBaseEyeHeight = BaseEyeHeight;
+	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	CrouchEyeOffset.Z += StartBaseEyeHeight - BaseEyeHeight + HalfHeightAdjust;
+	GetFirstPersonCameraComponent()->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight), false);
+}
+
+void APMCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	if (HalfHeightAdjust == 0.0f)
+	{
+		return;
+	}
+
+	float StartBaseEyeHeight = BaseEyeHeight;
+	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	CrouchEyeOffset.Z += StartBaseEyeHeight - BaseEyeHeight - HalfHeightAdjust;
+	GetFirstPersonCameraComponent()->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight), false);
+}
+
+void APMCharacter::CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult)
+{
+	if (GetFirstPersonCameraComponent())
+	{
+		GetFirstPersonCameraComponent()->GetCameraView(DeltaTime, OutResult);
+		OutResult.Location += CrouchEyeOffset;
+	}
+}
+
+void APMCharacter::Multicast_AdjustMeshForCrouch_Implementation(bool bCrouching)
+{
+	AdjustMeshOnCrouch(bCrouching);
+}
+
+void APMCharacter::Crouch(bool bClientSimulation)
+{
+	Super::Crouch(bClientSimulation);
+	Multicast_AdjustMeshForCrouch(true);
+}
+
+void APMCharacter::UnCrouch(bool bClientSimulation)
+{
+	Super::UnCrouch(bClientSimulation);
+	Multicast_AdjustMeshForCrouch(false);
 }
 
 void APMCharacter::OnRep_PlayerState()

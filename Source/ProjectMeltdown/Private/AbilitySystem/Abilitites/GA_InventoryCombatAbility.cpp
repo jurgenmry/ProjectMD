@@ -78,11 +78,11 @@ const bool UGA_InventoryCombatAbility::GetWeaponToFocusTraceResult(float TraceDi
 
 	const FVector FocusTraceEnd = CameraTransform.GetLocation() + CameraTransform.GetRotation().Vector() * TraceDistance;
 
-	TArray<AActor*> ActorsToIgnore = { GetAvatarActorFromActorInfo() };
+	TArray<AActor*> ActorsToIgnore = { GetAvatarActorFromActorInfo(), WeaponItemActor };
 
 	FHitResult FocusHit;
 
-	UKismetSystemLibrary::LineTraceSingle(this, CameraTransform.GetLocation(), FocusTraceEnd, TraceType, false, ActorsToIgnore, EDrawDebugTrace::None, FocusHit, true);
+	UKismetSystemLibrary::LineTraceSingle(this, CameraTransform.GetLocation(), FocusTraceEnd, TraceType, false, ActorsToIgnore, EDrawDebugTrace::Persistent, FocusHit, true);
 
 	FVector MuzzleLocation = WeaponItemActor->GetMuzzleLocation();
 

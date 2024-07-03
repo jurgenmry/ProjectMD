@@ -32,7 +32,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	USkeletalMeshComponent* Mesh3P;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* FirstPersonCameraComponent;
 
 	virtual void BeginPlay() override;
@@ -52,6 +52,29 @@ public:
 
 	virtual int32 GetPlayerlevel() override;
 
+
+	// Multicast functions to adjust the mesh position
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AdjustMeshForCrouch(bool bCrouching);
+
+	virtual void Crouch(bool bClientSimulation = false) override;
+	virtual void UnCrouch(bool bClientSimulation = false) override;
+
+	void AdjustMeshOnCrouch(bool bCrouching);
+
+	// Desired relative location and rotation when crouching
+	// Desired relative location and rotation when crouching
+	FVector CrouchedMeshRelativeLocation;
+	FVector UnCrouchedMeshRelativeLocation;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+	FVector CrouchEyeOffset;
+
+	float CrouchSpeed;
+
+	void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	void CalcCamera(float DeltaTime, struct FMinimalViewInfo& OutResult) override;
 
 	// Action Tags
 	UPROPERTY(EditDefaultsOnly)
