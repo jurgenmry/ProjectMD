@@ -271,8 +271,86 @@ void APMBaseCharacter::SetOxigen(float Oxigen)
 	}
 }
 
+void APMBaseCharacter::PlayAnimationMulticast(UAnimMontage* Animation3P, UAnimMontage* Animation1P, USkeletalMeshComponent* AnimMesh1P, USkeletalMeshComponent* AnimMesh3P)
+{
+	if (HasAuthority())
+	{
+		// Play animation on the server
+		ServerPlayAnimation(Animation3P, AnimMesh3P);
+	}
+
+	// Play first-person animation locally on the client
+	if (Animation1P && AnimMesh1P)
+	{
+		UAnimInstance* AnimInstance1P = AnimMesh1P->GetAnimInstance();
+		if (AnimInstance1P && !AnimInstance1P->Montage_IsPlaying(Animation1P))
+		{
+			AnimInstance1P->Montage_Play(Animation1P);
+		}
+	}
+}
+
+void APMBaseCharacter::ServerPlayAnimation_Implementation(UAnimMontage* Animation3P, USkeletalMeshComponent* AnimMesh3P)
+{
+	MulticastPlayAnimation(Animation3P, AnimMesh3P);
+}
+
+void APMBaseCharacter::MulticastPlayAnimation_Implementation(UAnimMontage* Animation3P, USkeletalMeshComponent* AnimMesh3P)
+{
+	if (Animation3P && AnimMesh3P)
+	{
+		UAnimInstance* AnimInstance3P = AnimMesh3P->GetAnimInstance();
+		if (AnimInstance3P && !AnimInstance3P->Montage_IsPlaying(Animation3P))
+		{
+			// Bind the events
+			AnimInstance3P->OnMontageEnded.AddDynamic(this, &APMBaseCharacter::HandleMontageEnded);
+			AnimInstance3P->OnMontageBlendingOut.AddDynamic(this, &APMBaseCharacter::HandleMontageBlendedOut);
+			AnimInstance3P->Montage_Play(Animation3P);
+		}
+	}
+}
+
+void APMBaseCharacter::HandleMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	OnCustomMontageEnded.Broadcast();
+
+	// Unbind the events
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->OnMontageEnded.RemoveDynamic(this, &APMBaseCharacter::HandleMontageEnded);
+	}
+}
+
+void APMBaseCharacter::HandleMontageBlendedOut(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (bInterrupted)
+	{
+		OnCustomMontageInterrupted.Broadcast();
+	}
+	else
+	{
+		OnCustomMontageBlendedOut.Broadcast();
+	}
+
+	// Unbind the events
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->OnMontageBlendingOut.RemoveDynamic(this, &APMBaseCharacter::HandleMontageBlendedOut);
+	}
+}
 
 
+
+
+
+
+
+
+
+
+
+
+/*
 EGDHitReactDirection APMBaseCharacter::GetHitReactDirection(const FVector& ImpactPoint)
 {
 	const FVector& ActorLocation = GetActorLocation();
@@ -382,3 +460,4 @@ void APMBaseCharacter::FinishDying()
 {
 	Destroy();
 }
+*/

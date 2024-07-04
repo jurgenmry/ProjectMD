@@ -162,6 +162,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USoundBase* AttackSound;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PhysicalMaterial)
+	UNiagaraSystem* MuzzleVFX = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag AmmoTag;
 };

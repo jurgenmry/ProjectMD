@@ -26,10 +26,12 @@ float UPMMovementComponent::GetMaxSpeed() const
 		return Super::GetMaxSpeed();
 	}
 
+	/*
 	if (!Owner->IsAlive())
 	{
 		return 0.0f;
 	}
+	*/
 
 	if (RequestToStartSprinting)
 	{

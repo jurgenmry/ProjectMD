@@ -13,6 +13,10 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterBaseHitReactDelegate, EGDHitReactDirection, Direction);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedDelegate, APMBaseCharacter*, Character);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCustomMontageEnded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCustomMontageBlendedOut);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCustomMontageInterrupted);
+
 
 UCLASS(Abstract)
 class PROJECTMELTDOWN_API APMBaseCharacter : public ACharacter, public IAbilitySystemInterface , public ICombatInterface
@@ -39,6 +43,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FCharacterDiedDelegate OnCharacterDied;
 
+	/*
 	UFUNCTION(BlueprintCallable)
 	EGDHitReactDirection GetHitReactDirection(const FVector& ImpactPoint);
 
@@ -53,6 +58,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDCharacter")
 	virtual void FinishDying();
+	*/
 
 	// Death Animation
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "GASDocumentation|Animation")
@@ -169,5 +175,46 @@ public:
 	virtual void SetRadiation(float Radiation);
 	virtual void SetStamina(float Stamina);
 	virtual void SetOxigen(float Oxigen);
+
+
+
+	//////////////////////////////////////////////////////////////////////////////
+	//																			//
+	// *************     FOR PLAYING ANIMATIONS ON CHARACTERS     ************* //
+	//                                                                          //        
+	//////////////////////////////////////////////////////////////////////////////
+
+
+	// Function to play animation
+	UFUNCTION(BlueprintCallable, Category = "Animation")
+	void PlayAnimationMulticast(UAnimMontage* Animation3P, UAnimMontage* Animation1P, USkeletalMeshComponent* AnimMesh1P, USkeletalMeshComponent* AnimMesh3P);
+
+	// Function to call on the server to play animation
+	UFUNCTION(Server, Reliable)
+	void ServerPlayAnimation(UAnimMontage* Animation3P, USkeletalMeshComponent* AnimMesh3P);
+
+	// Function to call on all clients to play animation
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayAnimation(UAnimMontage* Animation3P, USkeletalMeshComponent* AnimMesh3P);
+
+	// Delegate to handle montage end
+	UPROPERTY(BlueprintAssignable, Category = "Animation")
+	FOnCustomMontageEnded  OnCustomMontageEnded;
+
+	// Delegate to handle montage blend out
+	UPROPERTY(BlueprintAssignable, Category = "Animation")
+	FOnCustomMontageBlendedOut  OnCustomMontageBlendedOut;
+
+	// Delegate to handle montage interrupted
+	UPROPERTY(BlueprintAssignable, Category = "Animation")
+	FOnCustomMontageInterrupted  OnCustomMontageInterrupted;
+
+	// Internal function to handle montage end
+	UFUNCTION()
+	void HandleMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	// Internal function to handle montage blend out
+	UFUNCTION()
+	void HandleMontageBlendedOut(UAnimMontage* Montage, bool bInterrupted);
 
 };

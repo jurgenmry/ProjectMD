@@ -69,8 +69,8 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	FVector CrouchEyeOffset;
-
 	float CrouchSpeed;
+	FVector Mesh1PRelativeLocation;
 
 	void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
@@ -127,7 +127,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UInputAction* SprintInputAction;
 
-
+	// Variable to track the currently equipped weapon
+	int32 CurrentlyEquippedWeaponIndex;
 
 	// Input actions: 
 
@@ -168,7 +169,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCharacterData1FP(const FCharacterAnimationData& InCharacterData);
 	
-	virtual void FinishDying() override;
+	//virtual void FinishDying() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Replicated)
 	UInventoryComponent* InventoryComponent = nullptr;

@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 //Custome includes
 
@@ -20,7 +21,7 @@
 #include "AbilitySystem/PMBaseAbilitySystemComponent.h"
 #include "AbilitySystem/PMBaseAttributeSet.h"
 #include "UI/HUD/PMBaseHud.h"
-#include "AbilitySystemBlueprintLibrary.h"
+#include "Components/PMMovementComponent.h"
 
 // Input component
 #include "EnhancedInputComponent.h"
@@ -75,9 +76,13 @@ APMCharacter::APMCharacter(const class FObjectInitializer& ObjectInitializer)
 	// Initialize of Variables
 	CrouchedMeshRelativeLocation = FVector(0.0f, 0.0f, -55.0f);
 	UnCrouchedMeshRelativeLocation = FVector(0.0f,0.0f,-98.0f);
+	Mesh1PRelativeLocation = GetMesh1P()->GetRelativeLocation();
 
-	CrouchEyeOffset = FVector{ 0.0f };
 	CrouchSpeed = 12.0f;
+	CrouchEyeOffset = FVector::ZeroVector;
+
+	CurrentlyEquippedWeaponIndex = -1;
+	
 }
 
 void APMCharacter::BeginPlay()
@@ -92,17 +97,6 @@ void APMCharacter::BeginPlay()
 	{
 		SetActorTickEnabled(false);
 	}
-
-	
-	if (Mesh1P && GetMesh())
-	{
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance)
-		{
-			GetMesh()->SetAnimInstanceClass(AnimInstance->GetClass());
-		}
-	}
-	
 }
 
 void APMCharacter::Tick(float DeltaSeconds)
@@ -111,6 +105,14 @@ void APMCharacter::Tick(float DeltaSeconds)
 
 	float CrouchInterpTime = FMath::Min(1, CrouchSpeed * DeltaSeconds);
 	CrouchEyeOffset = (1.0f - CrouchInterpTime) * CrouchEyeOffset;
+
+	if (IsLocallyControlled() && Mesh1P)
+	{
+		FVector TargetLocation = GetCharacterMovement()->IsCrouching() ? FVector(0.0f, 0.0f, 0.0f) : FVector(0.0f, 0.0f, 0.0f);
+		FVector CurrentLocation = FMath::VInterpTo(Mesh1P->GetRelativeLocation(), TargetLocation, DeltaSeconds, CrouchSpeed);
+		Mesh1P->SetRelativeLocation(CurrentLocation);
+	}
+
 }
 
 void APMCharacter::PossessedBy(AController* NewController)
@@ -160,6 +162,13 @@ void APMCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightA
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 	CrouchEyeOffset.Z += StartBaseEyeHeight - BaseEyeHeight + HalfHeightAdjust;
 	GetFirstPersonCameraComponent()->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight), false);
+
+	if (IsLocallyControlled())
+	{
+		Mesh1P->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	}
+
+	AdjustMeshOnCrouch(true);
 }
 
 void APMCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
@@ -173,6 +182,12 @@ void APMCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdj
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 	CrouchEyeOffset.Z += StartBaseEyeHeight - BaseEyeHeight - HalfHeightAdjust;
 	GetFirstPersonCameraComponent()->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight), false);
+
+	if (IsLocallyControlled())
+	{
+		Mesh1P->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+	}
+	AdjustMeshOnCrouch(false);
 }
 
 void APMCharacter::CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult)
@@ -303,6 +318,7 @@ void APMCharacter::OnDropItemTriggered(const FInputActionValue& Value)
 
 void APMCharacter::OnEquipNextTriggered(const FInputActionValue& Value)
 {
+
 	FGameplayEventData EventPayload;
 	EventPayload.EventTag = UInventoryComponent::EquipNextTag;
 
@@ -316,6 +332,9 @@ void APMCharacter::OnUnequipTriggered(const FInputActionValue& Value)
 	EventPayload.EventTag = UInventoryComponent::UnequipTag;
 
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::UnequipTag, EventPayload);
+
+	// Reset the currently equipped weapon index
+	CurrentlyEquippedWeaponIndex = -1;
 }
 
 void APMCharacter::OnEquipItem(const FInputActionValue& Value)
@@ -338,34 +357,63 @@ void APMCharacter::OnEquipItem(const FInputActionValue& Value)
 
 void APMCharacter::OnEquipItem1Triggered(const FInputActionValue& Value)
 {
+	if (CurrentlyEquippedWeaponIndex == 0)
+	{
+		// If item 1 is already equipped, do nothing
+		return;
+	}
+
 	FGameplayEventData EventPayload;
 	EventPayload.EventTag = UInventoryComponent::EquipItem1Tag;
 
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem1Tag, EventPayload);
+	CurrentlyEquippedWeaponIndex = 0;
 }
 
 void APMCharacter::OnEquipItem2Triggered(const FInputActionValue& Value)
 {
+	if (CurrentlyEquippedWeaponIndex == 1)
+	{
+		// If item 2 is already equipped, do nothing
+		return;
+	}
+
 	FGameplayEventData EventPayload;
 	EventPayload.EventTag = UInventoryComponent::EquipItem2Tag;
 
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem2Tag, EventPayload);
+	CurrentlyEquippedWeaponIndex = 1;
 }
 
 void APMCharacter::OnEquipItem3Triggered(const FInputActionValue& Value)
 {
+	if (CurrentlyEquippedWeaponIndex == 2)
+	{
+		// If item 3 is already equipped, do nothing
+		return;
+	}
+
 	FGameplayEventData EventPayload;
 	EventPayload.EventTag = UInventoryComponent::EquipItem3Tag;
 
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem3Tag, EventPayload);
+	CurrentlyEquippedWeaponIndex = 2;
 }
 
 void APMCharacter::OnEquipItem4Triggered(const FInputActionValue& Value)
 {
+	if (CurrentlyEquippedWeaponIndex == 3)
+	{
+		// If item 4 is already equipped, do nothing
+		return;
+	}
+
 	FGameplayEventData EventPayload;
 	EventPayload.EventTag = UInventoryComponent::EquipItem4Tag;
 
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, UInventoryComponent::EquipItem4Tag, EventPayload);
+
+	CurrentlyEquippedWeaponIndex = 3;
 }
 
 void APMCharacter::OnCrouchActionStarted(const FInputActionValue& Value)
@@ -517,10 +565,12 @@ void APMCharacter::SetCharacterData1FP(const FCharacterAnimationData& InCharacte
 	CharacterAnimDataData1FP = InCharacterData;
 }
 
+/*
 void APMCharacter::FinishDying()
 {
 
 }
+*/
 
 
 

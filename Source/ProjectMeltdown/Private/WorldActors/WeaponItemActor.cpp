@@ -94,13 +94,14 @@ void AWeaponItemActor::PlayWeaponEffectsInternal(const FHitResult& InHitResult)
 		{
 			UGameplayStatics::PlaySoundAtLocation(this, PhysicalMaterial->PointImpactSound, InHitResult.ImpactPoint, 1.f);
 
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PhysicalMaterial->PointImpactVFX, InHitResult.ImpactPoint);
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PhysicalMaterial->PointImpactVFX, InHitResult.ImpactPoint);	
 		}
 	}
 
 	if (const UWeaponStaticData* WeaponData = GetWeaponStaticData())
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, WeaponData->AttackSound, GetActorLocation(), 1.f);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, WeaponData->MuzzleVFX, GetMuzzleLocation());
 	}
 }
 

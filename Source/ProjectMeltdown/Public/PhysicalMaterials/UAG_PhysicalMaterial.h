@@ -25,4 +25,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PhysicalMaterial)
 	UNiagaraSystem* PointImpactVFX = nullptr;
 
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PhysicalMaterial)
+	//UNiagaraSystem* WeaponMuzzleVFX = nullptr;
+
 };
