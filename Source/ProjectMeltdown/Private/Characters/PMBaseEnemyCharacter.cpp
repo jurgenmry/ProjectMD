@@ -7,6 +7,10 @@
 //Custome includes
 #include "AbilitySystem/PMBaseAbilitySystemComponent.h"
 #include "AbilitySystem/PMBaseAttributeSet.h"
+#include "AI/BaseAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
+#include "BehaviorTree/BehaviorTree.h"
 
 APMBaseEnemyCharacter::APMBaseEnemyCharacter(const class FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -16,6 +20,16 @@ APMBaseEnemyCharacter::APMBaseEnemyCharacter(const class FObjectInitializer& Obj
 
 
 	AttributeSet = CreateDefaultSubobject <UPMBaseAttributeSet>(TEXT("AttributeSet"));
+}
+
+void APMBaseEnemyCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (!HasAuthority())return;
+	Enemy_AIController = Cast<ABaseAIController>(NewController);
+	Enemy_AIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	Enemy_AIController->RunBehaviorTree(BehaviorTree);
 }
 
 void APMBaseEnemyCharacter::BeginPlay()

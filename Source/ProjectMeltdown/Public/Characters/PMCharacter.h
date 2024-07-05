@@ -69,8 +69,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	FVector CrouchEyeOffset;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	float CrouchSpeed;
-	FVector Mesh1PRelativeLocation;
+
+	FVector InitialMesh1PRelativeLocation;
 
 	void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;

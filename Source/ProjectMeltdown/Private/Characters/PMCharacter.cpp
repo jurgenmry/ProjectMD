@@ -75,10 +75,11 @@ APMCharacter::APMCharacter(const class FObjectInitializer& ObjectInitializer)
 
 	// Initialize of Variables
 	CrouchedMeshRelativeLocation = FVector(0.0f, 0.0f, -55.0f);
-	UnCrouchedMeshRelativeLocation = FVector(0.0f,0.0f,-98.0f);
-	Mesh1PRelativeLocation = GetMesh1P()->GetRelativeLocation();
+	UnCrouchedMeshRelativeLocation = FVector(0.0f,0.0f,-100.0f);
+	GetMesh1P()->SetRelativeLocation(FVector(0.314146, 0.000000,-169.997533));
+	InitialMesh1PRelativeLocation = GetMesh1P()->GetRelativeLocation();
 
-	CrouchSpeed = 12.0f;
+	CrouchSpeed = 0.f;
 	CrouchEyeOffset = FVector::ZeroVector;
 
 	CurrentlyEquippedWeaponIndex = -1;
@@ -106,13 +107,17 @@ void APMCharacter::Tick(float DeltaSeconds)
 	float CrouchInterpTime = FMath::Min(1, CrouchSpeed * DeltaSeconds);
 	CrouchEyeOffset = (1.0f - CrouchInterpTime) * CrouchEyeOffset;
 
-	if (IsLocallyControlled() && Mesh1P)
+	/*
+	if(IsLocallyControlled() && Mesh1P)
 	{
-		FVector TargetLocation = GetCharacterMovement()->IsCrouching() ? FVector(0.0f, 0.0f, 0.0f) : FVector(0.0f, 0.0f, 0.0f);
+		FVector TargetLocation = GetCharacterMovement()->IsCrouching()
+			? FVector(InitialMesh1PRelativeLocation.X, InitialMesh1PRelativeLocation.Y, InitialMesh1PRelativeLocation.Z)
+			: FVector(InitialMesh1PRelativeLocation.X, InitialMesh1PRelativeLocation.Y, InitialMesh1PRelativeLocation.Z + 4);
+
 		FVector CurrentLocation = FMath::VInterpTo(Mesh1P->GetRelativeLocation(), TargetLocation, DeltaSeconds, CrouchSpeed);
 		Mesh1P->SetRelativeLocation(CurrentLocation);
 	}
-
+	*/
 }
 
 void APMCharacter::PossessedBy(AController* NewController)
@@ -161,13 +166,6 @@ void APMCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightA
 	float StartBaseEyeHeight = BaseEyeHeight;
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 	CrouchEyeOffset.Z += StartBaseEyeHeight - BaseEyeHeight + HalfHeightAdjust;
-	GetFirstPersonCameraComponent()->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight), false);
-
-	if (IsLocallyControlled())
-	{
-		Mesh1P->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	}
-
 	AdjustMeshOnCrouch(true);
 }
 
@@ -181,12 +179,6 @@ void APMCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdj
 	float StartBaseEyeHeight = BaseEyeHeight;
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 	CrouchEyeOffset.Z += StartBaseEyeHeight - BaseEyeHeight - HalfHeightAdjust;
-	GetFirstPersonCameraComponent()->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight), false);
-
-	if (IsLocallyControlled())
-	{
-		Mesh1P->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-	}
 	AdjustMeshOnCrouch(false);
 }
 
