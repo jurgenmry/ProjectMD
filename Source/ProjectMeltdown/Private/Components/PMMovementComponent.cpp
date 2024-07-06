@@ -21,29 +21,32 @@ float UPMMovementComponent::GetMaxSpeed() const
 {
 	APMBaseCharacter* Owner = Cast<APMBaseCharacter>(GetOwner());
 
-	if (!Owner)
+	if (Owner)
 	{
-		return Super::GetMaxSpeed();
+		/*
+		if (!Owner->IsAlive())
+		{
+			return 0.0f;
+		}
+		*/
+
+		if (RequestToStartSprinting)
+		{
+			return Owner->GetMoveSpeed() * SprintSpeedMultiplier;
+		}
+
+		if (RequestToStartADS)
+		{
+			return Owner->GetMoveSpeed() * ADSSpeedMultiplier;
+		}
+
+		return Owner->GetMoveSpeed();
 	}
 
-	/*
-	if (!Owner->IsAlive())
+	else 
 	{
-		return 0.0f;
+			return Super::GetMaxSpeed();
 	}
-	*/
-
-	if (RequestToStartSprinting)
-	{
-		return Owner->GetMoveSpeed() * SprintSpeedMultiplier;
-	}
-
-	if (RequestToStartADS)
-	{
-		return Owner->GetMoveSpeed() * ADSSpeedMultiplier;
-	}
-
-	return Owner->GetMoveSpeed();
 }
 
 

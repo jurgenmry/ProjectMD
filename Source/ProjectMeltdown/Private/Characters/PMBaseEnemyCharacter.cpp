@@ -12,8 +12,7 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 
-APMBaseEnemyCharacter::APMBaseEnemyCharacter(const class FObjectInitializer& ObjectInitializer)
-	:Super(ObjectInitializer)
+APMBaseEnemyCharacter::APMBaseEnemyCharacter(const class FObjectInitializer& ObjectInitializer)	:Super(ObjectInitializer)
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UPMBaseAbilitySystemComponent>(TEXT("AbilitSystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
@@ -46,4 +45,8 @@ void APMBaseEnemyCharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	AbilitySystemComponent->AbilityActorInfoSet();
+	InitializeAttributes();
+	AddCharacterAbilities();
+
+	AttributeSet->SetMoveSpeed(1000);
 }

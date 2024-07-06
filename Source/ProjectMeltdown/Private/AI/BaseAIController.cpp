@@ -14,4 +14,6 @@ ABaseAIController::ABaseAIController()
 {
 	Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 	BehaviourTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviourTreeComponent"));
+
+	//Blackboard = BlackboardComponent;
 }
