@@ -151,6 +151,18 @@ void FPMGameplayTags::InitializeNativeGameplayTags()
 		FName("Ability.Combat.SingleShot"),
 		FString("To single shoot a weapon"));
 
+	/* Enemies */
+
+	GameplayTags.Enemy_Attack_Melee = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Enemy.Attack.Melee"),
+		FString("To single shoot a weapon"));
+
+	GameplayTags.Enemy_Attack_Ranger = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Enemy.Attack.Melee"),
+		FString("To single shoot a weapon"));
+
+
+
 
 	/* Notifies */
 

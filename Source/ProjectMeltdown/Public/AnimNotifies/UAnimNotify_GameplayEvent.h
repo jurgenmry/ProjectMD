@@ -17,7 +17,7 @@ class PROJECTMELTDOWN_API UUAnimNotify_GameplayEvent : public UAnimNotify
 		
 public:
 	
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 protected:
 

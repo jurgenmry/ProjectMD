@@ -13,6 +13,7 @@
 class USkeletalMeshComponent;
 class UCameraComponent;
 class UInventoryComponent;
+class UAIPerceptionStimuliSourceComponent;
 
 UCLASS()
 class PROJECTMELTDOWN_API APMCharacter : public APMBaseCharacter
@@ -34,6 +35,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCameraComponent* FirstPersonCameraComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UAIPerceptionStimuliSourceComponent* StimuliSourceCharacter;
 
 	virtual void BeginPlay() override;
 

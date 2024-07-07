@@ -7,7 +7,7 @@
 #include "BaseAIController.generated.h"
 
 class UBehaviorTreeComponent;
-class UBlackboardComponent;
+class UAIPerceptionComponent;
 
 UCLASS()
 class PROJECTMELTDOWN_API ABaseAIController : public AAIController
@@ -18,9 +18,10 @@ public:
 
 	ABaseAIController();
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviorTreeComponent> BehaviourTreeComponent;
 
-	UPROPERTY()
-	TObjectPtr<UBlackboardComponent>BlackboardComponent;
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UAIPerceptionComponent> CPerceptionComponent;
+
 };

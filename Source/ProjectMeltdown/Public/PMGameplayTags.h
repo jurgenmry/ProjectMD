@@ -117,6 +117,12 @@ public:
 	FGameplayTag Ability_Combat_SingleShot;
 	FGameplayTag Ability_Combat_Shoot; //Event.Combat.Shoot
 
+	/*Enemy Tags*/
+	FGameplayTag Enemy_Attack_Melee;
+	FGameplayTag Enemy_Attack_Ranger;
+
+
+
 	static FPMGameplayTags GameplayTags;
 	
 };

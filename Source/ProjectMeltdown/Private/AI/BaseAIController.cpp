@@ -7,6 +7,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 
 //custome Includes
 
@@ -15,5 +16,6 @@ ABaseAIController::ABaseAIController()
 	Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComponent"));
 	BehaviourTreeComponent = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviourTreeComponent"));
 
-	//Blackboard = BlackboardComponent;
+	CPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("CPerceptionComponent"));
+
 }

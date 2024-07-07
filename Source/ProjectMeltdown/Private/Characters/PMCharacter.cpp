@@ -13,6 +13,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 //Custome includes
 
@@ -72,6 +73,11 @@ APMCharacter::APMCharacter(const class FObjectInitializer& ObjectInitializer)
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	InventoryComponent->ComponentTags.Add(FName("Inventory"));
 	InventoryComponent->SetIsReplicated(true);
+
+
+	StimuliSourceCharacter = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceCharacter"));
+	StimuliSourceCharacter->bAutoRegister = true;
+
 
 	// Initialize of Variables
 	CrouchedMeshRelativeLocation = FVector(0.0f, 0.0f, -55.0f);
