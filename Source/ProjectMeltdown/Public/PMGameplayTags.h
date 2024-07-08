@@ -105,12 +105,8 @@ public:
 	FGameplayTag Movement_State_RemoveOnDeathTag;
 
 	/*Hit character*/
-	FGameplayTag Hit_Direction_FrontTag;
-	FGameplayTag Hit_Direction_BackTag;
-	FGameplayTag Hit_Direction_RightTag;
-	FGameplayTag Hit_Direction_LeftTag;
+	FGameplayTag Hit_React;
 
-	
 	FGameplayTag Attack_StartedEventTag;
 	FGameplayTag Attack_EndedEventTag;
 

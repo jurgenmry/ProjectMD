@@ -16,6 +16,7 @@
 #include "AbilitySystem/PMBaseAttributeSet.h"
 #include "AI/BaseAIController.h"
 #include "BlueprintLibraries/ProjectMeltdownStatics.h"
+#include "PMGameplayTags.h"
 
 
 APMBaseEnemyCharacter::APMBaseEnemyCharacter(const class FObjectInitializer& ObjectInitializer)	:Super(ObjectInitializer)
@@ -57,6 +58,30 @@ void APMBaseEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	InitAbilityActorInfo();
 
+	if (const UPMBaseAttributeSet* PMAttributeSet = Cast<UPMBaseAttributeSet>(AttributeSet))
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PMAttributeSet->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			}
+		);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PMAttributeSet->GetMaxHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			}
+		);
+
+		AbilitySystemComponent->RegisterGameplayTagEvent(FPMGameplayTags::Get().Hit_React, EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this,
+			&APMBaseEnemyCharacter::HitReactTagChanged
+		);
+
+		OnHealthChanged.Broadcast(PMAttributeSet->GetHealth());
+		OnMaxHealthChanged.Broadcast(PMAttributeSet->GetMaxHealth());
+	}
+
 
 }
 
@@ -64,7 +89,7 @@ void APMBaseEnemyCharacter::BeginPlay()
 void APMBaseEnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : 250.0f;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : AttributeSet->GetMoveSpeed();
 	if (Enemy_AIController && Enemy_AIController->GetBlackboardComponent())
 	{
 		Enemy_AIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);

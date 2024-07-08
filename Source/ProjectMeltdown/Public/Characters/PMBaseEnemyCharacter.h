@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Characters/PMBaseCharacter.h"
 #include "GameplayTagContainer.h"
+#include "UI/Controllers/PMOverlayWidgetController.h"
 #include "DataAssets/CharacterDataAsset.h"
 #include "PMBaseEnemyCharacter.generated.h"
 
@@ -19,12 +20,17 @@ class PROJECTMELTDOWN_API APMBaseEnemyCharacter : public APMBaseCharacter
 
 public:
 
+	/* Functions */
+
 	APMBaseEnemyCharacter(const class FObjectInitializer& ObjectInitializer);
 
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void BeginPlay() override;
 
+	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
+	/* Variables */
 	UPROPERTY(EditAnywhere, Category = "MAIN|Character Class Defaults")
 	ECharacterClass BaseCharacterClass = ECharacterClass::EnemyMelee;
 
@@ -40,7 +46,12 @@ public:
 	UPROPERTY()
 	TObjectPtr<ABaseAIController> Enemy_AIController;
 
-	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChangeSignature OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChangeSignature OnMaxHealthChanged;
+
 
 protected:
 
