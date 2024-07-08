@@ -61,7 +61,7 @@ public:
 	*/
 
 	// Death Animation
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "GASDocumentation|Animation")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MAIN||Animation")
 	UAnimMontage* DeathMontage;
 
 	FGameplayTag HitDirectionFrontTag;
@@ -86,21 +86,21 @@ protected:
 	TObjectPtr<class UPMBaseAttributeSet> AttributeSet;
 
 	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "GASDocumentation|Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MAIN|Abilities")
 	TArray<TSubclassOf<class UGameplayAbility>> CharacterAbilities;
 
 	// Default attributes for a character for initializing on spawn/respawn.
 	// This is an instant GE that overrides the values for attributes that get reset on spawn/respawn.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TSubclassOf<class UGameplayEffect> DefaultAttributes;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MAIN|Abilities")
+	TSubclassOf<class UGameplayEffect> VitaltAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MAIN|Abilities")
 	TSubclassOf<class UGameplayEffect> DefaultSecondaryAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MAIN|Abilities")
 	TSubclassOf<class UGameplayEffect> DefaultPrimaryAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MAIN|Abilities")
 	TSubclassOf<class UGameplayEffect> DefaultOvertimeAttributes;
 
 
@@ -186,7 +186,7 @@ public:
 
 
 	// Function to play animation
-	UFUNCTION(BlueprintCallable, Category = "Animation")
+	UFUNCTION(BlueprintCallable, Category = "MAIN|Animation")
 	void PlayAnimationMulticast(UAnimMontage* Animation3P, UAnimMontage* Animation1P, USkeletalMeshComponent* AnimMesh1P, USkeletalMeshComponent* AnimMesh3P);
 
 	// Function to call on the server to play animation
@@ -198,15 +198,15 @@ public:
 	void MulticastPlayAnimation(UAnimMontage* Animation3P, USkeletalMeshComponent* AnimMesh3P);
 
 	// Delegate to handle montage end
-	UPROPERTY(BlueprintAssignable, Category = "Animation")
+	UPROPERTY(BlueprintAssignable, Category = "MAIN|Animation")
 	FOnCustomMontageEnded  OnCustomMontageEnded;
 
 	// Delegate to handle montage blend out
-	UPROPERTY(BlueprintAssignable, Category = "Animation")
+	UPROPERTY(BlueprintAssignable, Category = "MAIN|Animation")
 	FOnCustomMontageBlendedOut  OnCustomMontageBlendedOut;
 
 	// Delegate to handle montage interrupted
-	UPROPERTY(BlueprintAssignable, Category = "Animation")
+	UPROPERTY(BlueprintAssignable, Category = "MAIN|Animation")
 	FOnCustomMontageInterrupted  OnCustomMontageInterrupted;
 
 	// Internal function to handle montage end

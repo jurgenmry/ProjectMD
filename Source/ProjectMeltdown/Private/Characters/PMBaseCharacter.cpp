@@ -63,7 +63,7 @@ void APMBaseCharacter::InitAbilityActorInfo()
 
 void APMBaseCharacter::InitializeAttributes()
 {
-	ApplyGEToSelf(DefaultAttributes, 1.f);
+	ApplyGEToSelf(VitaltAttributes, 1.f);
 	ApplyGEToSelf(DefaultPrimaryAttributes, 1.f);
 	ApplyGEToSelf(DefaultSecondaryAttributes, 1.f);
 	ApplyGEToSelf(DefaultOvertimeAttributes, 1.f);

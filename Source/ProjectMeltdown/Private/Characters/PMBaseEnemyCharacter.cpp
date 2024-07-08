@@ -15,9 +15,10 @@
 #include "AbilitySystem/PMBaseAbilitySystemComponent.h"
 #include "AbilitySystem/PMBaseAttributeSet.h"
 #include "AI/BaseAIController.h"
+#include "BlueprintLibraries/ProjectMeltdownStatics.h"
 
 
-APMBaseEnemyCharacter::APMBaseEnemyCharacter()//const class FObjectInitializer& ObjectInitializer)	:Super(ObjectInitializer)
+APMBaseEnemyCharacter::APMBaseEnemyCharacter(const class FObjectInitializer& ObjectInitializer)	:Super(ObjectInitializer)
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UPMBaseAbilitySystemComponent>(TEXT("AbilitSystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
@@ -28,24 +29,15 @@ APMBaseEnemyCharacter::APMBaseEnemyCharacter()//const class FObjectInitializer& 
 	//SetRootComponent(GetCapsuleComponent());
 	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationRoll = false;
-	bUseControllerRotationYaw = false;
-	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	//bUseControllerRotationPitch = false;
+	//bUseControllerRotationRoll = false;
+	//bUseControllerRotationYaw = false;
+	//GetCharacterMovement()->bUseControllerDesiredRotation = true;
 
 
 	bAlwaysRelevant = true;
 }
 
-UAbilitySystemComponent* APMBaseEnemyCharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent.Get();
-}
-
-UPMBaseAttributeSet* APMBaseEnemyCharacter::GetAttributeSetBase() const
-{
-	return AttributeSet.Get();
-}
 
 void APMBaseEnemyCharacter::PossessedBy(AController* NewController)
 {
@@ -62,11 +54,10 @@ void APMBaseEnemyCharacter::PossessedBy(AController* NewController)
 
 void APMBaseEnemyCharacter::BeginPlay()
 {
-	if (AbilitySystemComponent)
-	{
-		InitAbilityActorInfo();
-	}
-	
+	Super::BeginPlay();
+	InitAbilityActorInfo();
+
+
 }
 
 
@@ -85,7 +76,7 @@ void APMBaseEnemyCharacter::InitAbilityActorInfo()
 	
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UPMBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
-	AbilitySystemComponent->AbilityActorInfoSet();
+	//AbilitySystemComponent->AbilityActorInfoSet();
 	
 	if (HasAuthority())
 	{
@@ -94,84 +85,11 @@ void APMBaseEnemyCharacter::InitAbilityActorInfo()
 	}
 }
 
-void APMBaseEnemyCharacter::InitializeAttributes()
-{
-	ApplyGEToSelf(DefaultAttributes, 1.f);
-	ApplyGEToSelf(DefaultPrimaryAttributes, 1.f);
-	ApplyGEToSelf(DefaultSecondaryAttributes, 1.f);
-	ApplyGEToSelf(DefaultOvertimeAttributes, 1.f);
-}
-
-void APMBaseEnemyCharacter::AddCharacterAbilities()
-{
-	// Grant abilities, but only on the server	
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent || AbilitySystemComponent->bCharacterAbilitiesGiven)
-	{
-		return;
-	}
-
-	for (TSubclassOf<UGameplayAbility>& StartupAbility : CharacterAbilities)
-	{
-		AbilitySystemComponent->GiveAbility(
-			FGameplayAbilitySpec(StartupAbility));
-
-		//FString AbilityName = StartupAbility ? StartupAbility->GetName() : FString("Unknown");
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Black, FString::Printf(TEXT("Added Ability %s"), *AbilityName), 1);
-	}
-
-	AbilitySystemComponent->bCharacterAbilitiesGiven = true;
-}
-
-void APMBaseEnemyCharacter::RemoveCharacterAbilities()
-{
-	if (GetLocalRole() != ROLE_Authority || !AbilitySystemComponent || !AbilitySystemComponent->bCharacterAbilitiesGiven)
-	{
-		return;
-	}
-
-	// Remove any abilities added from a previous call. This checks to make sure the ability is in the startup 'CharacterAbilities' array.
-	TArray<FGameplayAbilitySpecHandle> AbilitiesToRemove;
-	for (const FGameplayAbilitySpec& Spec : AbilitySystemComponent->GetActivatableAbilities())
-	{
-		if ((Spec.SourceObject == this) && CharacterAbilities.Contains(Spec.Ability->GetClass()))
-		{
-			AbilitiesToRemove.Add(Spec.Handle);
-		}
-	}
-
-	// Do in two passes so the removal happens after we have the full list
-	for (int32 i = 0; i < AbilitiesToRemove.Num(); i++)
-	{
-		AbilitySystemComponent->ClearAbility(AbilitiesToRemove[i]);
-	}
-
-	AbilitySystemComponent->bCharacterAbilitiesGiven = false;
-}
-
-void APMBaseEnemyCharacter::ApplyGEToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level)
-{
-	if (!AbilitySystemComponent)
-	{
-		return;
-	}
-
-	if (!GameplayEffectClass)
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s() Missing DefaultAttributes for %s. Please fill in the character's Blueprint."), *FString(__FUNCTION__), *GetName());
-		return;
-	}
-
-	// Can run on Server and Client
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(this);
-
-	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, Level, EffectContext);
-	if (NewHandle.IsValid())
-	{
-		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
-	}
-}
-
 void APMBaseEnemyCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
+}
+
+void APMBaseEnemyCharacter::InitializeAttributes()
+{
+	UProjectMeltdownStatics::InitializeEnemyDefaultAttributes(this, BaseCharacterClass, AbilitySystemComponent);
 }

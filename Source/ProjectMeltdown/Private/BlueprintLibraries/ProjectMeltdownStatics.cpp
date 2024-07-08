@@ -3,10 +3,16 @@
 
 #include "BlueprintLibraries/ProjectMeltdownStatics.h"
 
+
+//System includes
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
+
+//Custome Includes
 #include "ProjectMeltdown/ProjectMeltdownProjectile.h"
+#include "GameModes/PMGameModeBase.h"
 
 static TAutoConsoleVariable<int32> CVarShowRadialDamage(
 	TEXT("ShowRadialDamage"),
@@ -122,4 +128,26 @@ AProjectMeltdownProjectile* UProjectMeltdownStatics::LaunchProjectile(UObject* W
 	}
 
 	return nullptr;
+}
+
+void UProjectMeltdownStatics::InitializeEnemyDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, UAbilitySystemComponent* ASC)
+{
+	APMGameModeBase* GameMode = Cast<APMGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (GameMode)
+	{
+		return;
+	}
+	
+	UCharacterDataAsset* CharacterClassInfo =  GameMode->CharacterClassInfo;
+
+	FCharacterDataClassDefaultInfo ClassDefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
+	
+	const FGameplayEffectSpecHandle PrimaryAttributesSpecHandle = ASC->MakeOutgoingSpec(ClassDefaultInfo.PrimaryAttributes, 1,  ASC->MakeEffectContext());
+	ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttributesSpecHandle.Data.Get());
+
+	const FGameplayEffectSpecHandle SecondaryAttributesSpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->SecondaryAttributes, 1, ASC->MakeEffectContext());
+	ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributesSpecHandle.Data.Get());
+
+	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->VitalAttributes, 1, ASC->MakeEffectContext());
+	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }

@@ -6,9 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "PMGameModeBase.generated.h"
 
-/**
- * 
- */
+
+class UCharacterDataAsset;
+
 UCLASS()
 class PROJECTMELTDOWN_API APMGameModeBase : public AGameModeBase
 {
@@ -16,6 +16,7 @@ class PROJECTMELTDOWN_API APMGameModeBase : public AGameModeBase
 
 public:
 
-
+	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
+	TObjectPtr<UCharacterDataAsset> CharacterClassInfo;
 	
 };

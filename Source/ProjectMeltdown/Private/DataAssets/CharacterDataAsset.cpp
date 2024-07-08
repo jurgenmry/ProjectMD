@@ -3,3 +3,7 @@
 
 #include "DataAssets/CharacterDataAsset.h"
 
+FCharacterDataClassDefaultInfo UCharacterDataAsset::GetClassDefaultInfo(ECharacterClass CharacterClass)
+{
+    return CharacterClassInformation.FindChecked(CharacterClass);
+}
