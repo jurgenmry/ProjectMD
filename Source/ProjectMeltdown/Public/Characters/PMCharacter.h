@@ -191,7 +191,6 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 
-
 //Character data
 
 	UPROPERTY()//ReplicatedUsing = OnRep_CharacterData)

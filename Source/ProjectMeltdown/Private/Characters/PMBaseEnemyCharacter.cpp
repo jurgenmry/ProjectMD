@@ -75,13 +75,13 @@ void APMBaseEnemyCharacter::InitAbilityActorInfo()
 {
 	
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-	Cast<UPMBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
-	//AbilitySystemComponent->AbilityActorInfoSet();
+	//Cast<UPMBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+	AbilitySystemComponent->AbilityActorInfoSet();
 	
 	if (HasAuthority())
 	{
 		InitializeAttributes();
-		AddCharacterAbilities();
+		//AddCharacterAbilities();
 	}
 }
 

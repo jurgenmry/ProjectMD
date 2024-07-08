@@ -59,7 +59,7 @@ FGameplayEffectSpecHandle UGA_InventoryCombatAbility::GetWeaponEffectSpec(const 
 
 			FGameplayEffectSpecHandle OutSpec = AbilityComponent->MakeOutgoingSpec(WeaponStaticData->DamageEffect, 1, EffectContext);
 
-			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(OutSpec, FGameplayTag::RequestGameplayTag(TEXT("Attributes.Secondary.Health")), -WeaponStaticData->BaseDamage);
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(OutSpec, FGameplayTag::RequestGameplayTag(TEXT("Attributes.Meta.Damage")), WeaponStaticData->BaseDamage);
 
 			return OutSpec;
 		}

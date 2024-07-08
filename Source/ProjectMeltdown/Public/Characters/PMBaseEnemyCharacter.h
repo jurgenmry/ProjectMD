@@ -48,5 +48,5 @@ protected:
 	
 	void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
-	virtual void InitializeAttributes() override;
+	virtual void InitializeAttributes() override ;
 };

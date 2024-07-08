@@ -95,6 +95,8 @@ public:
 	FGameplayTag Attributes_Secondary_MaxRadiationResist;
 	FGameplayTag Attributes_Secondary_CarriyingCapacity;
 
+	/* Meta Attribute Tags*/
+	FGameplayTag Attributes_Meta_Damage;
 	
 	/* State Tags */
 	FGameplayTag Movement_State_Crouch;

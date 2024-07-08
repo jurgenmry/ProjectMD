@@ -1,14 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "AbilitySystem/PMBaseAttributeSet.h"
-#include "ProjectMeltdown/Public/Characters/PMBaseCharacter.h"
+
+//System includes
 #include "GameplayEffect.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
+#include "AbilitySystemBlueprintLibrary.h"
+
+
+//Custome includes
+#include "ProjectMeltdown/Public/Characters/PMBaseCharacter.h"
 #include "Controllers/PMMainCharacterPlayerController.h"
 
-//#include "Player/GDPlayerController.h"
 
 UPMBaseAttributeSet::UPMBaseAttributeSet()
 {
@@ -48,6 +52,10 @@ void UPMBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 {
 	Super::PostGameplayEffectExecute(Data);
 
+	FEffectProperties Props;
+	SetEffectProperties(Data, Props);
+
+	/*
 	//Source = couser of the effect
 	//Target = Target of the effect (Owner of this Atribute set)
 
@@ -61,6 +69,8 @@ void UPMBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 	AActor* TargetActor = nullptr;
 	AController* TargetController = nullptr;
 	APMBaseCharacter* TargetCharacter = nullptr;
+	
+
 	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
 	{
 		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
@@ -100,7 +110,9 @@ void UPMBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 			SourceActor = Context.GetEffectCauser();
 		}
 	}
+	*/
 
+	/*
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
 		// Try to extract a hit result
@@ -125,90 +137,94 @@ void UPMBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 				//WasAlive = TargetCharacter->IsAlive();
 			}
 
-			/*if (!TargetCharacter->IsAlive())
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("%s() %s is NOT alive when receiving damage"), TEXT(__FUNCTION__), *TargetCharacter->GetName());
-			}*/
+			//if (!TargetCharacter->IsAlive())
+			//{
+			//	//UE_LOG(LogTemp, Warning, TEXT("%s() %s is NOT alive when receiving damage"), TEXT(__FUNCTION__), *TargetCharacter->GetName());
+			//}
 
 			// Apply the health change and then clamp it
 			const float NewHealth = GetHealth() - LocalDamageDone;
 			SetHealth(FMath::Clamp(NewHealth, 0.0f, GetMaxHealth()));
 
-			/*
-			if (TargetCharacter && WasAlive)
-			{
+			//Start block here
+			//if (TargetCharacter && WasAlive)
+			//{
 				// This is the log statement for damage received. Turned off for live games.
 				//UE_LOG(LogTemp, Log, TEXT("%s() %s Damage Received: %f"), TEXT(__FUNCTION__), *GetOwningActor()->GetName(), LocalDamageDone);
 
 				// Play HitReact animation and sound with a multicast RPC.
 				const FHitResult* Hit = Data.EffectSpec.GetContext().GetHitResult();
 
-				if (Hit)
-				{
-					EGDHitReactDirection HitDirection = TargetCharacter->GetHitReactDirection(Data.EffectSpec.GetContext().GetHitResult()->Location);
-					switch (HitDirection)
-					{
-					case EGDHitReactDirection::Left:
-						TargetCharacter->PlayHitReact(HitDirectionLeftTag, SourceCharacter);
-						break;
-					case EGDHitReactDirection::Front:
-						TargetCharacter->PlayHitReact(HitDirectionFrontTag, SourceCharacter);
-						break;
-					case EGDHitReactDirection::Right:
-						TargetCharacter->PlayHitReact(HitDirectionRightTag, SourceCharacter);
-						break;
-					case EGDHitReactDirection::Back:
-						TargetCharacter->PlayHitReact(HitDirectionBackTag, SourceCharacter);
-						break;
-					}
-				}
-				else
-				{
-					// No hit result. Default to front.
-					TargetCharacter->PlayHitReact(HitDirectionFrontTag, SourceCharacter);
-				}
-
+				//if (Hit)
+				//{
+				//	EGDHitReactDirection HitDirection = TargetCharacter->GetHitReactDirection(Data.EffectSpec.GetContext().GetHitResult()->Location);
+				//	switch (HitDirection)
+				//	{
+				//	case EGDHitReactDirection::Left:
+				//		TargetCharacter->PlayHitReact(HitDirectionLeftTag, SourceCharacter);
+				//		break;
+				//	case EGDHitReactDirection::Front:
+				//		TargetCharacter->PlayHitReact(HitDirectionFrontTag, SourceCharacter);
+				//		break;
+				//	case EGDHitReactDirection::Right:
+				//		TargetCharacter->PlayHitReact(HitDirectionRightTag, SourceCharacter);
+				//		break;
+				//	case EGDHitReactDirection::Back:
+				//		TargetCharacter->PlayHitReact(HitDirectionBackTag, SourceCharacter);
+				//		break;
+				//	}
+				//}
+				//else
+				//{
+				//	// No hit result. Default to front.
+				//	TargetCharacter->PlayHitReact(HitDirectionFrontTag, SourceCharacter);
+				//}
+				//
 				// Show damage number for the Source player unless it was self damage
-				if (SourceActor != TargetActor)
-				{
-					AGDPlayerController* PC = Cast<AGDPlayerController>(SourceController);
-					if (PC)
-					{
-						PC->ShowDamageNumber(LocalDamageDone, TargetCharacter);
-					}
-				}
+				//if (SourceActor != TargetActor)
+				//{
+				//	AGDPlayerController* PC = Cast<AGDPlayerController>(SourceController);
+				//	if (PC)
+				//	{
+				//		PC->ShowDamageNumber(LocalDamageDone, TargetCharacter);
+				//	}
+				//}
 
-				if (!TargetCharacter->IsAlive())
-				{
-					// TargetCharacter was alive before this damage and now is not alive, give XP and Gold bounties to Source.
-					// Don't give bounty to self.
-					if (SourceController != TargetController)
-					{
-						// Create a dynamic instant Gameplay Effect to give the bounties
-						UGameplayEffect* GEBounty = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TEXT("Bounty")));
-						GEBounty->DurationPolicy = EGameplayEffectDurationType::Instant;
+				//if (!TargetCharacter->IsAlive())
+				//{
+				//	// TargetCharacter was alive before this damage and now is not alive, give XP and Gold bounties to Source.
+				//	// Don't give bounty to self.
+				//	if (SourceController != TargetController)
+				//	{
+				//		// Create a dynamic instant Gameplay Effect to give the bounties
+				//		UGameplayEffect* GEBounty = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TEXT("Bounty")));
+				//		GEBounty->DurationPolicy = EGameplayEffectDurationType::Instant;
+				//
+				//		int32 Idx = GEBounty->Modifiers.Num();
+				//		GEBounty->Modifiers.SetNum(Idx + 2);
+				//
+				//		FGameplayModifierInfo& InfoXP = GEBounty->Modifiers[Idx];
+				//		InfoXP.ModifierMagnitude = FScalableFloat(GetXPBounty());
+				//		InfoXP.ModifierOp = EGameplayModOp::Additive;
+				//		InfoXP.Attribute = UGDAttributeSetBase::GetXPAttribute();
+				//
+				//		FGameplayModifierInfo& InfoGold = GEBounty->Modifiers[Idx + 1];
+				//		InfoGold.ModifierMagnitude = FScalableFloat(GetGoldBounty());
+				//		InfoGold.ModifierOp = EGameplayModOp::Additive;
+				//		InfoGold.Attribute = UGDAttributeSetBase::GetGoldAttribute();
+				//
+				//		Source->ApplyGameplayEffectToSelf(GEBounty, 1.0f, Source->MakeEffectContext());
+				//	}
+				//}
+			//}	
+		//}
+	//	}*/
 
-						int32 Idx = GEBounty->Modifiers.Num();
-						GEBounty->Modifiers.SetNum(Idx + 2);
-
-						FGameplayModifierInfo& InfoXP = GEBounty->Modifiers[Idx];
-						InfoXP.ModifierMagnitude = FScalableFloat(GetXPBounty());
-						InfoXP.ModifierOp = EGameplayModOp::Additive;
-						InfoXP.Attribute = UGDAttributeSetBase::GetXPAttribute();
-
-						FGameplayModifierInfo& InfoGold = GEBounty->Modifiers[Idx + 1];
-						InfoGold.ModifierMagnitude = FScalableFloat(GetGoldBounty());
-						InfoGold.ModifierOp = EGameplayModOp::Additive;
-						InfoGold.Attribute = UGDAttributeSetBase::GetGoldAttribute();
-
-						Source->ApplyGameplayEffectToSelf(GEBounty, 1.0f, Source->MakeEffectContext());
-					}
-				}
-			}	*/
-		}
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		HandleIncomingDamage(Props);
 	}
 
-	
 	if (Data.EvaluatedData.Attribute == GetRadiationAttribute())
 	{
 		// Store a local copy of the amount of damage done and clear the damage attribute
@@ -241,8 +257,6 @@ void UPMBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 
 	else if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
-		// Handle other health changes.
-		// Health loss should go through Damage.
 		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
 	} 
 	
@@ -273,6 +287,58 @@ void UPMBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 		SetResilience(FMath::Clamp(GetResilience(), 0.0f, GetMaxResilience()));
 	}
 }
+
+void UPMBaseAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
+{
+	// Source = causer of the effect, Target = target of the effect (owner of this AS)
+	Props.EffectContextHandle = Data.EffectSpec.GetContext();
+	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
+
+	if (IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid() && Props.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Props.SourceAvatarActor = Props.SourceASC->AbilityActorInfo->AvatarActor.Get();
+		Props.SourceController = Props.SourceASC->AbilityActorInfo->PlayerController.Get();
+		if (Props.SourceController == nullptr && Props.SourceAvatarActor != nullptr)
+		{
+			if (const APawn* Pawn = Cast<APawn>(Props.SourceAvatarActor))
+			{
+				Props.SourceController = Pawn->GetController();
+			}
+		}
+		if (Props.SourceController)
+		{
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
+		}
+	}
+
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	{
+		Props.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		Props.TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
+		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
+		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
+	}
+
+
+}
+
+void UPMBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
+{
+	const float LocalIncomingDamage = GetIncomingDamage();
+	SetIncomingDamage(0.f);
+	if (LocalIncomingDamage > 0.f)
+	{
+		const float NewHealth = GetHealth() - LocalIncomingDamage;
+		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+		const bool bFatal = NewHealth <= 0.f;
+		//if (bFatal)
+		//{
+		//}
+	}
+
+}
+
 
 void UPMBaseAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -332,6 +398,8 @@ void UPMBaseAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& Af
 		AbilityComp->ApplyModToAttributeUnsafe(AffectedAttributeProperty, EGameplayModOp::Additive, NewDelta);
 	}
 }
+
+
 
 
 /////////////////////////////////////////////////////////////

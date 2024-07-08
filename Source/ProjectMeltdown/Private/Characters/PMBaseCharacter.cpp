@@ -61,6 +61,7 @@ void APMBaseCharacter::InitAbilityActorInfo()
 {
 }
 
+
 void APMBaseCharacter::InitializeAttributes()
 {
 	ApplyGEToSelf(VitaltAttributes, 1.f);
@@ -68,6 +69,7 @@ void APMBaseCharacter::InitializeAttributes()
 	ApplyGEToSelf(DefaultSecondaryAttributes, 1.f);
 	ApplyGEToSelf(DefaultOvertimeAttributes, 1.f);
 }
+
 
 void APMBaseCharacter::AddCharacterAbilities()
 {
@@ -129,13 +131,13 @@ void APMBaseCharacter::ApplyGEToSelf(TSubclassOf<UGameplayEffect> GameplayEffect
 	}
 
 	// Can run on Server and Client
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponent()->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, Level, EffectContext);
+	const FGameplayEffectSpecHandle NewHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, EffectContext);
 	if (NewHandle.IsValid())
 	{
-		FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent.Get());
+		FActiveGameplayEffectHandle ActiveGEHandle = GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), GetAbilitySystemComponent());
 	}
 }
 

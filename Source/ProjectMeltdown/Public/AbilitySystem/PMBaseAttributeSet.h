@@ -64,6 +64,41 @@
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
 
+USTRUCT()
+struct FEffectProperties
+{
+	GENERATED_BODY()
+
+	FEffectProperties() {}
+
+	FGameplayEffectContextHandle EffectContextHandle;
+
+	UPROPERTY()
+	UAbilitySystemComponent* SourceASC = nullptr;
+
+	UPROPERTY()
+	AActor* SourceAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* SourceController = nullptr;
+
+	UPROPERTY()
+	ACharacter* SourceCharacter = nullptr;
+
+	UPROPERTY()
+	UAbilitySystemComponent* TargetASC = nullptr;
+
+	UPROPERTY()
+	AActor* TargetAvatarActor = nullptr;
+
+	UPROPERTY()
+	AController* TargetController = nullptr;
+
+	UPROPERTY()
+	ACharacter* TargetCharacter = nullptr;
+};
+
+
 UCLASS()
 class PROJECTMELTDOWN_API UPMBaseAttributeSet : public UAttributeSet
 {
@@ -73,15 +108,9 @@ public:
 
 	UPMBaseAttributeSet();
 
-	// AttributeSet Overrides
-
 	virtual void PreAttributeChange(const FGameplayAttribute & Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	// Current Health, when 0 we expect owner to die unless prevented by an ability. Capped by MaxHealth.
-	// Positive changes can directly use this.
-	// Negative changes to Health should go through Damage meta attribute.
 
 
 
@@ -314,20 +343,11 @@ public:
 		UFUNCTION()
 		virtual void OnRep_RadRegenRate(const FGameplayAttributeData& OldRadRegenRate);
 
-
-		// Damage is a meta attribute used by the DamageExecution to calculate final damage, which then turns into -Health
-		// Temporary value that only exists on the Server. Not replicated.
-		UPROPERTY(BlueprintReadOnly, Category = "Other attributes")
-		FGameplayAttributeData Damage;
-		ATTRIBUTE_ACCESSORS(UPMBaseAttributeSet, Damage)
-
-
 		UPROPERTY(BlueprintReadOnly, Category = "Other attributes", ReplicatedUsing = OnRep_CharacterLevel)
 		FGameplayAttributeData CharacterLevel;
 		ATTRIBUTE_ACCESSORS(UPMBaseAttributeSet, CharacterLevel)
 		UFUNCTION()
 		virtual void OnRep_CharacterLevel(const FGameplayAttributeData& OldCharacterLevel);
-
 
 		// Experience points gained from killing enemies. Used to level up (not implemented in this project).
 		UPROPERTY(BlueprintReadOnly, Category = "Other attributes", ReplicatedUsing = OnRep_XP)
@@ -350,10 +370,29 @@ public:
 		UFUNCTION()
 		virtual void OnRep_GoldBounty(const FGameplayAttributeData& OldGoldBounty);
 
+		//======================================================== //
+		//                                                         //   
+		//                      META ATTRIBUTES                    //
+		//                                                         //  
+		//======================================================== //
+
+
+		// Damage is a meta attribute used by the DamageExecution to calculate final damage, which then turns into -Health
+		// Temporary value that only exists on the Server. Not replicated.
+		UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+		FGameplayAttributeData IncomingDamage;
+		ATTRIBUTE_ACCESSORS(UPMBaseAttributeSet, IncomingDamage)
+
+
 protected:
 
 	// Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes.
 	// (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before)
 	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
 	
+
+private:
+
+	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
+	void HandleIncomingDamage(const FEffectProperties& Props);
 };

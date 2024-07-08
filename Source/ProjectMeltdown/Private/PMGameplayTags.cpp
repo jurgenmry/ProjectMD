@@ -98,6 +98,12 @@ void FPMGameplayTags::InitializeNativeGameplayTags()
 		FName("Attributes.Secondary.CarriyingCapacity"),
 		FString("How much weight we can carry"));
 
+	/* META ATTRIBUTES  */
+
+	GameplayTags.Attributes_Meta_Damage = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Attributes.Meta.Damage"),
+		FString("Damaged to players"));
+
 
 	/* State Tags */
 	GameplayTags.Movement_State_Crouch = UGameplayTagsManager::Get().AddNativeGameplayTag(
