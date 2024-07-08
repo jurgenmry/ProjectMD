@@ -49,6 +49,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Common class Defaults")
 	TSubclassOf<class UGameplayEffect> SecondaryAttributes;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
+	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
+
 	FCharacterDataClassDefaultInfo GetClassDefaultInfo(ECharacterClass CharacterClass);
 
 };

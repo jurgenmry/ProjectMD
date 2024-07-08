@@ -9,9 +9,8 @@
 #include "PMBaseCharacter.generated.h"
 
 
+class UAnimMontage;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterBaseHitReactDelegate, EGDHitReactDirection, Direction);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedDelegate, APMBaseCharacter*, Character);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCustomMontageEnded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCustomMontageBlendedOut);
@@ -32,46 +31,15 @@ public:
 
 	class UPMBaseAttributeSet* GetAttributeSetBase() const;
 
-	virtual int32 GetPlayerlevel() override;
-
-	/* NEW CODE */
-
-	// Set the Hit React direction in the Animation Blueprint
-	UPROPERTY(BlueprintAssignable)
-	FCharacterBaseHitReactDelegate ShowHitReact;
-
-	UPROPERTY(BlueprintAssignable)
-	FCharacterDiedDelegate OnCharacterDied;
-
-	/*
-	UFUNCTION(BlueprintCallable)
-	EGDHitReactDirection GetHitReactDirection(const FVector& ImpactPoint);
-
-	UFUNCTION(BlueprintCallable)
-	virtual bool IsAlive() const;
+	virtual int32 GetPlayerlevel() override;	// Set the Hit React direction in the Animation Blueprint
 
 
-	UFUNCTION(NetMulticast, Reliable, WithValidation)
-	virtual void PlayHitReact(FGameplayTag HitDirection, AActor* DamageCauser);
+	/** Combat Interface */
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 
-	virtual void Die();
+	UPROPERTY(EditAnywhere, Category = "MAIN|Abilities")
+	TObjectPtr<UAnimMontage>HitReactMontage;
 
-	UFUNCTION(BlueprintCallable, Category = "GASDocumentation|GDCharacter")
-	virtual void FinishDying();
-	*/
-
-	// Death Animation
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MAIN||Animation")
-	UAnimMontage* DeathMontage;
-
-	FGameplayTag HitDirectionFrontTag;
-	FGameplayTag HitDirectionBackTag;
-	FGameplayTag HitDirectionRightTag;
-	FGameplayTag HitDirectionLeftTag;
-	FGameplayTag DeadTag;
-	FGameplayTag EffectRemoveOnDeathTag;
-
-	/* END OF NEW CODE */
 
 protected:
 	
