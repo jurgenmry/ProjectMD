@@ -10,6 +10,7 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 //Custome includes
 #include "AbilitySystem/PMBaseAbilitySystemComponent.h"
@@ -106,6 +107,23 @@ void APMBaseEnemyCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, i
 	{
 		Enemy_AIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
 	}
+}
+
+void APMBaseEnemyCharacter::Die()
+{
+	EnemyMulticastHandleDeath();
+}
+
+void APMBaseEnemyCharacter::EnemyMulticastHandleDeath_Implementation()
+{
+
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 }
 
 void APMBaseEnemyCharacter::InitAbilityActorInfo()

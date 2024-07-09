@@ -44,10 +44,10 @@ public:
 	TMap<ECharacterClass, FCharacterDataClassDefaultInfo> CharacterClassInformation;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Common class Defaults")
-	TSubclassOf<class UGameplayEffect> VitalAttributes;
+	TSubclassOf<class UGameplayEffect> SecondaryAttributes;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Common class Defaults")
-	TSubclassOf<class UGameplayEffect> SecondaryAttributes;
+	TSubclassOf<class UGameplayEffect> VitalAttributes;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Common Class Defaults")
 	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;

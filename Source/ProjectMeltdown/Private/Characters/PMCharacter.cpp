@@ -153,6 +153,28 @@ int32 APMCharacter::GetPlayerlevel()
 	return 1;
 }
 
+void APMCharacter::Die()
+{
+	CharacterMulticastHandleDeath();
+}
+
+void APMCharacter::CharacterMulticastHandleDeath_Implementation()
+{
+	GetMesh1P()->SetSimulatePhysics(true);
+	GetMesh3P()->SetSimulatePhysics(true);
+
+	GetMesh1P()->SetEnableGravity(true);
+	GetMesh3P()->SetEnableGravity(true);
+
+	GetMesh1P()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh1P()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+	GetMesh3P()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh3P()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
 void APMCharacter::AdjustMeshOnCrouch(bool bCrouching)
 {
 	FVector NewLocation = bCrouching ? CrouchedMeshRelativeLocation : UnCrouchedMeshRelativeLocation;

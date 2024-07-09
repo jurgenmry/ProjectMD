@@ -48,6 +48,10 @@ UAnimMontage* APMBaseCharacter::GetHitReactMontage_Implementation()
 	return HitReactMontage;
 }
 
+void APMBaseCharacter::Die()
+{
+}
+
 void APMBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();

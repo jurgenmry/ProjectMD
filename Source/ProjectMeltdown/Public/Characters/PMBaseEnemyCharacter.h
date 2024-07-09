@@ -30,6 +30,7 @@ public:
 
 	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 
+
 	/* Variables */
 	UPROPERTY(EditAnywhere, Category = "MAIN|Character Class Defaults")
 	ECharacterClass BaseCharacterClass = ECharacterClass::EnemyMelee;
@@ -52,6 +53,12 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangeSignature OnMaxHealthChanged;
 
+
+	/*Combat interface*/
+	virtual void Die() override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void EnemyMulticastHandleDeath();
 
 protected:
 

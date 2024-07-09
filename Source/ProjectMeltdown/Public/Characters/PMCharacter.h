@@ -57,6 +57,13 @@ public:
 	virtual int32 GetPlayerlevel() override;
 
 
+	//For diying
+
+	virtual void Die() override;
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void CharacterMulticastHandleDeath();
+
 	// Multicast functions to adjust the mesh position
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_AdjustMeshForCrouch(bool bCrouching);

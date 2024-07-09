@@ -34,4 +34,6 @@ public:
 	UAnimMontage* GetHitReactMontage();
 
 	virtual int32 GetPlayerlevel() = 0;
+
+	virtual void Die() = 0;
 };

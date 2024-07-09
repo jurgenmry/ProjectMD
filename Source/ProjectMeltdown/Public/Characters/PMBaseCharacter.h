@@ -40,6 +40,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "MAIN|Abilities")
 	TObjectPtr<UAnimMontage>HitReactMontage;
 
+	virtual void Die()  override;
 
 protected:
 	
