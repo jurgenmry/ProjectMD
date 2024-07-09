@@ -31,4 +31,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "PMAbilitySystemLibrary|CharacterDefaults")
 	static void InitializeEnemyDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, UAbilitySystemComponent* ASC);
+
+	UFUNCTION(BlueprintCallable, Category = "PMAbilitySystemLibrary|CharacterDefaults")
+	static void GiveStartupAbilitites(const UObject* WorldContextObject, UAbilitySystemComponent* ASC);
 };

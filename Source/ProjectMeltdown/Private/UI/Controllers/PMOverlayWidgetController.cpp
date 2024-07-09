@@ -30,19 +30,19 @@ void UPMOverlayWidgetController::BroadCastInitialValues()
 	*/
 
 	/*Health Broadcast*/
-	OnHealthChanged.Broadcast(Character->GetHealth());
-	OnMaxHealthChanged.Broadcast(Character->GetMaxHealth());
+	OnHealthChanged.Broadcast(PS->GetHealth());
+	OnMaxHealthChanged.Broadcast(PS->GetMaxHealth());
 
 	/*Rad Broadcast*/
-	OnRadiationChanged.Broadcast(Character->GetRadiation());
+	OnRadiationChanged.Broadcast(PS->GetRadiation());
 
 	/* Oxigen Broadcast*/
-	OnOxigenChanged.Broadcast(Character->GetOxigen());
-	OnMaxOxigenChanged.Broadcast(Character->GetMaxOxigen());
+	OnOxigenChanged.Broadcast(PS->GetOxigen());
+	OnMaxOxigenChanged.Broadcast(PS->GetMaxOxigen());
 
 	/*Stamina Broadcast*/
-	OnStaminaChanged.Broadcast(Character->GetStamina());
-	OnMaxStaminaChanged.Broadcast(Character->GetMaxStamina());
+	OnStaminaChanged.Broadcast(PS->GetStamina());
+	OnMaxStaminaChanged.Broadcast(PS->GetMaxStamina());
 	OnStaminaRegenRateChanged.Broadcast(PS->GetStaminaRegenRate()); 
 	// Need to check this one, should be in the character ?
 

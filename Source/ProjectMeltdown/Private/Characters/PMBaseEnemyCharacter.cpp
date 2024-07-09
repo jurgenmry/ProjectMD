@@ -57,7 +57,18 @@ void APMBaseEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAbilityActorInfo();
+	UProjectMeltdownStatics::GiveStartupAbilitites(this, AbilitySystemComponent);
 
+	if (AttributeSet)
+	{
+		AbilitySystemComponent->RegisterGameplayTagEvent(FPMGameplayTags::Get().Hit_React, EGameplayTagEventType::NewOrRemoved).AddUObject(
+			this,
+			&APMBaseEnemyCharacter::HitReactTagChanged
+		);
+
+	}
+
+	/*
 	if (const UPMBaseAttributeSet* PMAttributeSet = Cast<UPMBaseAttributeSet>(AttributeSet))
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(PMAttributeSet->GetHealthAttribute()).AddLambda(
@@ -81,6 +92,7 @@ void APMBaseEnemyCharacter::BeginPlay()
 		OnHealthChanged.Broadcast(PMAttributeSet->GetHealth());
 		OnMaxHealthChanged.Broadcast(PMAttributeSet->GetMaxHealth());
 	}
+	*/
 
 
 }
@@ -100,13 +112,12 @@ void APMBaseEnemyCharacter::InitAbilityActorInfo()
 {
 	
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-	//Cast<UPMBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
+	Cast<UPMBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 	AbilitySystemComponent->AbilityActorInfoSet();
 	
 	if (HasAuthority())
 	{
 		InitializeAttributes();
-		//AddCharacterAbilities();
 	}
 }
 

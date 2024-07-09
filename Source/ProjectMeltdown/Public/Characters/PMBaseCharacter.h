@@ -31,7 +31,7 @@ public:
 
 	class UPMBaseAttributeSet* GetAttributeSetBase() const;
 
-	virtual int32 GetPlayerlevel() override;	// Set the Hit React direction in the Animation Blueprint
+	virtual int32 GetPlayerlevel() override;
 
 
 	/** Combat Interface */
@@ -95,23 +95,6 @@ public:
 	//////////////////////////////////////////////////////////////////////////////
 
 
-	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
-	float GetHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
-	float GetMaxHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
-	float GetRadiation() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
-	float GetMaxRadiation() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
-	float GetStamina() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
-	float GetMaxStamina() const;
 
 	// Gets the Current value of MoveSpeed
 	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
@@ -120,29 +103,6 @@ public:
 	// Gets the Base value of MoveSpeed
 	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
 	float GetMoveSpeedBaseValue() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
-	float GetOxigen() const;
-
-	UFUNCTION(BlueprintCallable, Category = "GAS|BaseCharacter|Attributes")
-	float GetMaxOxigen() const;
-
-
-	//////////////////////////////////////////////////////////////////////////////
-	//																			//
-	// *************       ATTRIBUTE SETTERS PMAttributeSet       ************* //
-	//                                                                          //        
-	//////////////////////////////////////////////////////////////////////////////
-
-	/**
-	* Setters for Attributes. Only use these in special cases like Respawning, otherwise use a GE to change Attributes.
-	* These change the Attribute's Base Value.
-	*/
-
-	virtual void SetHealth(float Health);
-	virtual void SetRadiation(float Radiation);
-	virtual void SetStamina(float Stamina);
-	virtual void SetOxigen(float Oxigen);
 
 
 

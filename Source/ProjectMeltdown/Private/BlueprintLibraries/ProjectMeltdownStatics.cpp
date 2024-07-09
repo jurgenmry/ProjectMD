@@ -164,3 +164,19 @@ void UProjectMeltdownStatics::InitializeEnemyDefaultAttributes(const UObject* Wo
 	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(CharacterClassInfo->VitalAttributes, 1, VitalAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
+
+void UProjectMeltdownStatics::GiveStartupAbilitites(const UObject* WorldContextObject, UAbilitySystemComponent* ASC)
+{
+	APMGameModeBase* GameMode = Cast<APMGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (!GameMode)
+	{
+		return;
+	}
+
+	UCharacterDataAsset* CharacterClassInfo = GameMode->CharacterClassInfo;
+	for (TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		ASC->GiveAbility(AbilitySpec);
+	}
+}

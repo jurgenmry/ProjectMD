@@ -30,12 +30,12 @@ APMBaseCharacter::APMBaseCharacter(const class FObjectInitializer& ObjectInitial
 
 UAbilitySystemComponent* APMBaseCharacter::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent.Get();
+	return AbilitySystemComponent;
 }
 
 UPMBaseAttributeSet* APMBaseCharacter::GetAttributeSetBase() const
 {
-	return AttributeSet.Get();
+	return AttributeSet;
 }
 
 int32 APMBaseCharacter::GetPlayerlevel()
@@ -137,65 +137,7 @@ void APMBaseCharacter::ApplyGEToSelf(TSubclassOf<UGameplayEffect> GameplayEffect
 	}
 }
 
-float APMBaseCharacter::GetHealth() const
-{
-	if (AttributeSet)
-	{
-		return AttributeSet->GetHealth();
-	}
 
-	return 0.0f;
-}
-
-float APMBaseCharacter::GetMaxHealth() const
-{
-	if (AttributeSet)
-	{
-		return AttributeSet->GetMaxHealth();
-	}
-
-	return 0.0f;
-}
-
-float APMBaseCharacter::GetRadiation() const
-{
-	if (AttributeSet)
-	{
-		return AttributeSet->GetRadiation();
-	}
-
-	return 0.0f;
-}
-
-float APMBaseCharacter::GetMaxRadiation() const
-{
-	if (AttributeSet)
-	{
-		return AttributeSet->GetMaxRadiation();
-	}
-
-	return 0.0f;
-}
-
-float APMBaseCharacter::GetStamina() const
-{
-	if (AttributeSet)
-	{
-		return AttributeSet->GetStamina();
-	}
-
-	return 0.0f;
-}
-
-float APMBaseCharacter::GetMaxStamina() const
-{
-	if (AttributeSet)
-	{
-		return AttributeSet->GetMaxStamina();
-	}
-
-	return 0.0f;
-}
 
 float APMBaseCharacter::GetMoveSpeed() const
 {
@@ -217,57 +159,6 @@ float APMBaseCharacter::GetMoveSpeedBaseValue() const
 	return 0.0f;
 }
 
-float APMBaseCharacter::GetOxigen() const
-{
-	if (AttributeSet)
-	{
-		return AttributeSet->GetOxigen();
-	}
-
-	return 0.0f;
-}
-
-float APMBaseCharacter::GetMaxOxigen() const
-{
-	if (AttributeSet)
-	{
-		return AttributeSet->GetMaxOxigen();
-	}
-
-	return 0.0f;
-}
-
-void APMBaseCharacter::SetHealth(float Health)
-{
-	if (AttributeSet)
-	{
-		AttributeSet->SetHealth(Health);
-	}
-}
-
-void APMBaseCharacter::SetRadiation(float Radiation)
-{
-	if (AttributeSet)
-	{
-		AttributeSet->SetRadiation(Radiation);
-	}
-}
-
-void APMBaseCharacter::SetStamina(float Stamina)
-{
-	if (AttributeSet)
-	{
-		AttributeSet->SetStamina(Stamina);
-	}
-}
-
-void APMBaseCharacter::SetOxigen(float Oxigen)
-{
-	if (AttributeSet)
-	{
-		AttributeSet->SetOxigen(Oxigen);
-	}
-}
 
 void APMBaseCharacter::PlayAnimationMulticast(UAnimMontage* Animation3P, UAnimMontage* Animation1P, USkeletalMeshComponent* AnimMesh1P, USkeletalMeshComponent* AnimMesh3P)
 {

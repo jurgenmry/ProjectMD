@@ -226,23 +226,11 @@ void APMCharacter::InitAbilityActorInfo()
 	APMPlayerState* MainPlayerState = GetPlayerState<APMPlayerState>();
 	if (MainPlayerState)
 	{
-		// Set the ASC on the Server. Clients do this in OnRep_PlayerState()
-		//AbilitySystemComponent = Cast<UGDAbilitySystemComponent>(PS->GetAbilitySystemComponent());?? why casting
-		
-
-		// AI won't have PlayerControllers so we can init again here just to be sure. No harm in initing twice for heroes that have PlayerControllers.
 		MainPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(MainPlayerState, this);
 		AbilitySystemComponent = Cast<UPMBaseAbilitySystemComponent>(MainPlayerState->GetAbilitySystemComponent());
 		AbilitySystemComponent->AbilityActorInfoSet();
-
-		// Set the AttributeSetBase for convenience attribute functions
 		AttributeSet = MainPlayerState->GetAttributeSetBase();
 
-
-		//Custome code
-		//AbilitySystemComponent->AbilityActorInfoSet();
-
-		AttributeSet->SetHealth(100.0f);
 		InitializeAttributes();
 		AddCharacterAbilities();
 	
@@ -261,39 +249,7 @@ void APMCharacter::InitAbilityActorInfo()
 				InventoryComponent->InitCustomeComponent(AbilitySystemComponent);
 			}
 		}
-
-		/* Custome code based on Trenak (Needs Review for implementation)
-
-		//Bind player input to the AbilitySystemComponent. Also called in SetupPlayerInputComponent because of a potential race condition.
-		BindASCInput();
-
-		// If we handle players disconnecting and rejoining in the future, we'll have to change this so that possession from rejoining doesn't reset attributes.
-		// For now assume possession = spawn/respawn.
-
-		InitializeAttributes();
-		InitializeFloatingStatusBar();
-
-		// Respawn specific things that won't affect first possession.
-
-		// Forcibly set the DeadTag count to 0
-		AbilitySystemComponent->SetTagMapCount(DeadTag, 0);
-
-		// Set Health/Mana/Stamina to their max. This is only necessary for *Respawn*.
-
-		SetHealth(GetMaxHealth());
-		SetMana(GetMaxMana());
-		SetStamina(GetMaxStamina());
-
-		// End respawn specific things
-
-		AddStartupEffects();
-
-		AddCharacterAbilities();
-
-		*/
-
 	}
-
 }
 
 

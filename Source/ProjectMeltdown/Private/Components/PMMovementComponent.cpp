@@ -32,15 +32,15 @@ float UPMMovementComponent::GetMaxSpeed() const
 
 		if (RequestToStartSprinting)
 		{
-			return Owner->GetMoveSpeed() * SprintSpeedMultiplier;
+			return Owner->GetMoveSpeedBaseValue() * SprintSpeedMultiplier;
 		}
 
 		if (RequestToStartADS)
 		{
-			return Owner->GetMoveSpeed() * ADSSpeedMultiplier;
+			return Owner->GetMoveSpeedBaseValue() * ADSSpeedMultiplier;
 		}
 
-		return Owner->GetMoveSpeed();
+		return Owner->GetMoveSpeedBaseValue();
 	}
 
 	else 
