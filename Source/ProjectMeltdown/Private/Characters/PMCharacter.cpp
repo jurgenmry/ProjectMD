@@ -14,6 +14,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include"GameFramework/SpringArmComponent.h"
 
 //Custome includes
 
@@ -77,6 +78,11 @@ APMCharacter::APMCharacter(const class FObjectInitializer& ObjectInitializer)
 
 	StimuliSourceCharacter = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceCharacter"));
 	StimuliSourceCharacter->bAutoRegister = true;
+
+	SpectatorSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpectatorSpringArm"));
+	SpectatorSpringArm->SetupAttachment(GetMesh3P());
+	SpectatorSpringArm->TargetArmLength = 500.0f;
+	SpectatorSpringArm->SetIsReplicated(true);
 
 
 	// Initialize of Variables
@@ -160,6 +166,8 @@ void APMCharacter::Die()
 
 void APMCharacter::CharacterMulticastHandleDeath_Implementation()
 {
+	//UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
+
 	GetMesh1P()->SetSimulatePhysics(true);
 	GetMesh3P()->SetSimulatePhysics(true);
 
@@ -173,6 +181,8 @@ void APMCharacter::CharacterMulticastHandleDeath_Implementation()
 	GetMesh3P()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+
 }
 
 void APMCharacter::AdjustMeshOnCrouch(bool bCrouching)

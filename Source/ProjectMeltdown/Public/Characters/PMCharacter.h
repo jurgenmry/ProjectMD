@@ -11,6 +11,7 @@
 
 
 class USkeletalMeshComponent;
+class USpringArmComponent;
 class UCameraComponent;
 class UInventoryComponent;
 class UAIPerceptionStimuliSourceComponent;
@@ -28,6 +29,9 @@ public:
 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	USpringArmComponent* SpectatorSpringArm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	USkeletalMeshComponent* Mesh1P;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
@@ -43,11 +47,13 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	FORCEINLINE USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 
-	USkeletalMeshComponent* GetMesh3P() const { return Mesh3P; }
+	FORCEINLINE USkeletalMeshComponent* GetMesh3P() const { return Mesh3P; }
 	
-	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	FORCEINLINE UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	FORCEINLINE USpringArmComponent* GetSpectatorSpringArm() const { return SpectatorSpringArm;  }
 
 	// Only called on the Server. Calls before Server's AcknowledgePossession.
 	virtual void PossessedBy(AController* NewController) override;
