@@ -19,3 +19,4 @@ ABaseAIController::ABaseAIController()
 	CPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("CPerceptionComponent"));
 
 }
+
