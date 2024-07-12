@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviorTreeComponent> BehaviourTreeComponent;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAIPerceptionComponent> CPerceptionComponent;
 
 };
